@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Close modal and redirect to OTP verification
                     const modal = bootstrap.Modal.getInstance(document.getElementById('loginModal'));
                     modal.hide();
-                    window.location.href = '/verify-otp?type=signin';
+                    window.location.href = `/verify-otp?type=signin&token=${encodeURIComponent(data.token)}`;
                 } else {
                     showToast(data.message, 'error');
                 }
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Close modal and redirect to OTP verification
                     const modal = bootstrap.Modal.getInstance(document.getElementById('registerModal'));
                     modal.hide();
-                    window.location.href = '/verify-otp?type=signup';
+                    window.location.href = `/verify-otp?type=signup&token=${encodeURIComponent(data.token)}`;
                 } else {
                     showToast(data.message, 'error');
                 }

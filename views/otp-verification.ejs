@@ -128,6 +128,14 @@
 
             try {
                 const type = new URLSearchParams(window.location.search).get('type') || 'signup';
+                const token = new URLSearchParams(window.location.search).get('token');
+                
+                if (!token) {
+                    alert('Missing verification token. Please start the process again.');
+                    window.location.href = '/';
+                    return;
+                }
+                
                 const endpoint = type === 'signup' ? '/auth/signup/verify-otp' : '/auth/signin/verify-otp';
                 
                 const response = await fetch(endpoint, {
@@ -135,7 +143,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ otp })
+                    body: JSON.stringify({ otp, token })
                 });
 
                 const data = await response.json();

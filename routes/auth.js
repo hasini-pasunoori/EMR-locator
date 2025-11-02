@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const { body, validationResult } = require('express-validator');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const OTP = require('../models/OTP');
 const { sendWelcomeEmail, sendOTPEmail } = require('../config/emailService');
@@ -49,15 +50,20 @@ router.post('/signup/send-otp', [
     });
     await otpDoc.save();
 
-    // Store user data in session temporarily
-    req.session.pendingUser = { name, email: email.toLowerCase(), password, role: role || 'user' };
+    // Create JWT token with user data
+    const token = jwt.sign(
+      { name, email: email.toLowerCase(), password, role: role || 'user', type: 'signup' },
+      process.env.SESSION_SECRET || 'emergency-medical-resource-secret-key',
+      { expiresIn: '10m' }
+    );
 
     // Send OTP email
     await sendOTPEmail(email.toLowerCase(), otp, 'signup');
 
     res.json({
       success: true,
-      message: 'OTP sent to your email. Please verify to complete registration.'
+      message: 'OTP sent to your email. Please verify to complete registration.',
+      token
     });
 
   } catch (error) {
@@ -71,26 +77,34 @@ router.post('/signup/send-otp', [
 
 // Verify OTP and complete signup
 router.post('/signup/verify-otp', [
-  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+  body('token').notEmpty().withMessage('Token is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid OTP format'
+        message: 'Invalid OTP format or missing token'
       });
     }
 
-    const { otp } = req.body;
-    const pendingUser = req.session.pendingUser;
-
-    if (!pendingUser) {
-      console.log('Session data:', req.session);
+    const { otp, token } = req.body;
+    
+    let pendingUser;
+    try {
+      pendingUser = jwt.verify(token, process.env.SESSION_SECRET || 'emergency-medical-resource-secret-key');
+    } catch (err) {
       return res.status(400).json({
         success: false,
-        message: 'No pending registration found. Please start signup again.',
-        debug: 'Session expired or not found'
+        message: 'Invalid or expired token. Please start signup again.'
+      });
+    }
+
+    if (pendingUser.type !== 'signup') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid token type'
       });
     }
 
@@ -119,9 +133,8 @@ router.post('/signup/verify-otp', [
 
     await user.save();
 
-    // Delete OTP and pending user data
+    // Delete OTP
     await OTP.deleteOne({ _id: otpDoc._id });
-    delete req.session.pendingUser;
 
     // Log in the user
     req.logIn(user, (err) => {
@@ -217,15 +230,20 @@ router.post('/signin/send-otp', [
     });
     await otpDoc.save();
 
-    // Store user ID in session temporarily
-    req.session.pendingSignin = { userId: user._id };
+    // Create JWT token with user ID
+    const token = jwt.sign(
+      { userId: user._id, type: 'signin' },
+      process.env.SESSION_SECRET || 'emergency-medical-resource-secret-key',
+      { expiresIn: '10m' }
+    );
 
     // Send OTP email
     await sendOTPEmail(email.toLowerCase(), otp, 'signin');
 
     res.json({
       success: true,
-      message: 'OTP sent to your email. Please verify to complete login.'
+      message: 'OTP sent to your email. Please verify to complete login.',
+      token
     });
 
   } catch (error) {
@@ -239,26 +257,34 @@ router.post('/signin/send-otp', [
 
 // Verify OTP and complete signin
 router.post('/signin/verify-otp', [
-  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits')
+  body('otp').isLength({ min: 6, max: 6 }).withMessage('OTP must be 6 digits'),
+  body('token').notEmpty().withMessage('Token is required')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid OTP format'
+        message: 'Invalid OTP format or missing token'
       });
     }
 
-    const { otp } = req.body;
-    const pendingSignin = req.session.pendingSignin;
-
-    if (!pendingSignin) {
-      console.log('Session data:', req.session);
+    const { otp, token } = req.body;
+    
+    let pendingSignin;
+    try {
+      pendingSignin = jwt.verify(token, process.env.SESSION_SECRET || 'emergency-medical-resource-secret-key');
+    } catch (err) {
       return res.status(400).json({
         success: false,
-        message: 'No pending signin found. Please start signin again.',
-        debug: 'Session expired or not found'
+        message: 'Invalid or expired token. Please start signin again.'
+      });
+    }
+
+    if (pendingSignin.type !== 'signin') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid token type'
       });
     }
 
@@ -284,9 +310,8 @@ router.post('/signin/verify-otp', [
       });
     }
 
-    // Delete OTP and pending signin data
+    // Delete OTP
     await OTP.deleteOne({ _id: otpDoc._id });
-    delete req.session.pendingSignin;
 
     // Log in the user
     req.logIn(user, (err) => {
