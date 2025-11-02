@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donor Dashboard - EMResource</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar { min-height: 100vh; background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%); }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .stat-card { border-left: 4px solid; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+        .availability-toggle { font-size: 1.2em; }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Donor Panel</h4>
+                        <small class="text-light">EMResource</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview">
+                                <i class="fas fa-tachometer-alt me-2"></i>Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#requests">
+                                <i class="fas fa-hand-holding-heart me-2"></i>Blood Requests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#history">
+                                <i class="fas fa-history me-2"></i>Donation History
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#profile">
+                                <i class="fas fa-user me-2"></i>Donor Profile
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a class="nav-link" href="/settings">
+                                <i class="fas fa-cog me-2"></i>Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Donor Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <div class="form-check form-switch availability-toggle me-3">
+                            <input class="form-check-input" type="checkbox" id="availabilityToggle">
+                            <label class="form-check-label" for="availabilityToggle">
+                                <span id="availabilityStatus">Available for Donation</span>
+                            </label>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overview Section -->
+                <div id="overview" class="section">
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #dc3545;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Blood Type</h6>
+                                            <h3 class="mb-0" id="bloodType">-</h3>
+                                        </div>
+                                        <i class="fas fa-tint fa-2x text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #28a745;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Total Donations</h6>
+                                            <h3 class="mb-0" id="totalDonations">-</h3>
+                                        </div>
+                                        <i class="fas fa-heart fa-2x text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #007bff;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Pending Requests</h6>
+                                            <h3 class="mb-0" id="pendingRequests">-</h3>
+                                        </div>
+                                        <i class="fas fa-clock fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #ffc107;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Lives Saved</h6>
+                                            <h3 class="mb-0" id="livesSaved">-</h3>
+                                        </div>
+                                        <i class="fas fa-user-shield fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Recent Blood Requests Near You</h5>
+                                </div>
+                                <div class="card-body" id="nearbyRequests">
+                                    Loading...
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Donation Eligibility</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Last Donation Date</label>
+                                        <input type="date" class="form-control" id="lastDonationDate">
+                                    </div>
+                                    <div class="alert alert-info" id="eligibilityStatus">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        <span id="eligibilityText">Enter your last donation date to check eligibility</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Blood Requests Section -->
+                <div id="requests" class="section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3>Blood Requests</h3>
+                        <div>
+                            <select class="form-select d-inline-block w-auto me-2" id="requestFilter">
+                                <option value="all">All Requests</option>
+                                <option value="urgent">Urgent Only</option>
+                                <option value="nearby">Nearby (10km)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Blood Type</th>
+                                    <th>Priority</th>
+                                    <th>Location</th>
+                                    <th>Distance</th>
+                                    <th>Deadline</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestsTable">
+                                <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Donation History Section -->
+                <div id="history" class="section d-none">
+                    <h3>Donation History</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Hospital</th>
+                                    <th>Patient</th>
+                                    <th>Blood Type</th>
+                                    <th>Status</th>
+                                    <th>Certificate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyTable">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Donor Profile Section -->
+                <div id="profile" class="section d-none">
+                    <h3>Donor Profile</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="donorProfileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Full Name</label>
+                                        <input type="text" class="form-control" id="donorName" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Blood Type</label>
+                                        <select class="form-select" id="donorBloodType" required>
+                                            <option value="">Select Blood Type</option>
+                                            <option value="A+">A+</option>
+                                            <option value="A-">A-</option>
+                                            <option value="B+">B+</option>
+                                            <option value="B-">B-</option>
+                                            <option value="AB+">AB+</option>
+                                            <option value="AB-">AB-</option>
+                                            <option value="O+">O+</option>
+                                            <option value="O-">O-</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Age</label>
+                                        <input type="number" class="form-control" id="donorAge" min="18" max="65" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Weight (kg)</label>
+                                        <input type="number" class="form-control" id="donorWeight" min="50" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Phone Number</label>
+                                        <input type="tel" class="form-control" id="donorPhone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Emergency Contact</label>
+                                        <input type="tel" class="form-control" id="emergencyContact">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" id="donorAddress" rows="3"></textarea>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="availableForEmergency">
+                                            <label class="form-check-label" for="availableForEmergency">
+                                                Available for emergency calls (24/7)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const target = link.getAttribute('href').substring(1);
+                    showSection(target);
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            if (sectionId === 'overview') loadOverview();
+            else if (sectionId === 'requests') loadRequests();
+            else if (sectionId === 'history') loadHistory();
+            else if (sectionId === 'profile') loadProfile();
+        }
+
+        async function loadOverview() {
+            try {
+                const response = await fetch('/api/donor/stats');
+                const data = await response.json();
+                
+                if (data.success && data.donor) {
+                    document.getElementById('bloodType').textContent = data.donor.bloodType || '-';
+                    document.getElementById('totalDonations').textContent = data.stats.totalDonations || 0;
+                    document.getElementById('pendingRequests').textContent = data.stats.pendingRequests || 0;
+                    document.getElementById('livesSaved').textContent = data.stats.livesSaved || 0;
+                    
+                    // Update availability toggle
+                    document.getElementById('availabilityToggle').checked = data.donor.isAvailable;
+                    updateAvailabilityStatus(data.donor.isAvailable);
+                }
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        // Availability toggle
+        document.getElementById('availabilityToggle').addEventListener('change', async (e) => {
+            try {
+                const response = await fetch('/api/donors/availability', {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isAvailable: e.target.checked })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    updateAvailabilityStatus(e.target.checked);
+                } else {
+                    e.target.checked = !e.target.checked; // Revert on error
+                    alert('Error updating availability: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating availability:', error);
+                e.target.checked = !e.target.checked; // Revert on error
+            }
+        });
+
+        function updateAvailabilityStatus(isAvailable) {
+            const statusText = document.getElementById('availabilityStatus');
+            statusText.textContent = isAvailable ? 'Available for Donation' : 'Not Available';
+            statusText.className = isAvailable ? 'text-success' : 'text-muted';
+        }
+
+        // Eligibility checker
+        document.getElementById('lastDonationDate').addEventListener('change', (e) => {
+            const lastDate = new Date(e.target.value);
+            const today = new Date();
+            const daysDiff = Math.floor((today - lastDate) / (1000 * 60 * 60 * 24));
+            
+            const eligibilityDiv = document.getElementById('eligibilityStatus');
+            const eligibilityText = document.getElementById('eligibilityText');
+            
+            if (daysDiff >= 56) { // 8 weeks
+                eligibilityDiv.className = 'alert alert-success';
+                eligibilityText.innerHTML = '<i class="fas fa-check-circle me-2"></i>You are eligible to donate blood!';
+            } else {
+                const remainingDays = 56 - daysDiff;
+                eligibilityDiv.className = 'alert alert-warning';
+                eligibilityText.innerHTML = `<i class="fas fa-clock me-2"></i>You can donate again in ${remainingDays} days`;
+            }
+        });
+
+        function refreshData() {
+            const activeSection = document.querySelector('.nav-link.active').getAttribute('href').substring(1);
+            showSection(activeSection);
+        }
+
+        // Initialize
+        loadOverview();
+    </script>
+</body>
+</html>

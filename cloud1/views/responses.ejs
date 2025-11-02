@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-red: #e63946; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fa; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { font-weight: 700; color: var(--primary-red) !important; }
+        .main-container { margin-top: 80px; padding: 2rem; }
+        .response-item { background: white; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-heartbeat me-2"></i>EMResource</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/settings">Settings</a>
+                <a class="nav-link" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <h2 class="mb-4">My Responses</h2>
+        
+        <div id="responsesList">
+            <div class="text-center py-5">
+                <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                <p class="mt-3">Loading your responses...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadResponses);
+
+        async function loadResponses() {
+            try {
+                const [incomingRes, outgoingRes] = await Promise.all([
+                    fetch('/api/emergency/user/incoming-responses'),
+                    fetch('/api/emergency/user/outgoing-responses')
+                ]);
+                
+                const incoming = await incomingRes.json();
+                const outgoing = await outgoingRes.json();
+                
+                let html = '';
+                
+                if (incoming.success && incoming.data.length > 0) {
+                    html += `<h5 class="mb-3">Incoming Responses (Received)</h5>`;
+                    html += incoming.data.map(req => `
+                        <div class="response-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6>${req.type.toUpperCase()} Request</h6>
+                                <span class="badge bg-info">${req.responses.length} responses</span>
+                            </div>
+                            <p class="text-muted">${req.description}</p>
+                            <div class="mt-2">
+                                ${req.responses.map(resp => `
+                                    <div class="border-start border-3 border-success ps-3 mb-2">
+                                        <strong>From:</strong> ${resp.responder.name}<br>
+                                        <strong>Message:</strong> ${resp.message || 'No message'}<br>
+                                        <small class="text-muted">Responded: ${new Date(resp.respondedAt).toLocaleDateString()}</small>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                if (outgoing.success && outgoing.data.length > 0) {
+                    html += `<h5 class="mb-3 mt-4">Outgoing Responses (Given)</h5>`;
+                    html += outgoing.data.map(req => `
+                        <div class="response-item">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6>${req.type.toUpperCase()} Request by ${req.requester.name}</h6>
+                                <span class="badge bg-warning">Responded</span>
+                            </div>
+                            <p class="text-muted">${req.description}</p>
+                            <div class="border-start border-3 border-primary ps-3">
+                                <strong>Your Response:</strong> ${req.myResponse.message || 'No message'}<br>
+                                <small class="text-muted">Responded: ${new Date(req.myResponse.respondedAt).toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                if (!html) {
+                    html = `
+                        <div class="text-center py-5">
+                            <i class="fas fa-reply fa-3x text-muted mb-3"></i>
+                            <p>No responses found</p>
+                            <p class="text-muted">Your responses to emergency requests will appear here</p>
+                        </div>
+                    `;
+                }
+                
+                document.getElementById('responsesList').innerHTML = html;
+            } catch (error) {
+                console.error('Error loading responses:', error);
+            }
+        }
+    </script>
+</body>
+</html>

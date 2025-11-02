@@ -1,0 +1,580 @@
+{
+  "routes": {
+    "admin": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/admin.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/dashboard",
+          "fullPath": "/api/admin/dashboard"
+        },
+        {
+          "method": "GET",
+          "path": "/stats",
+          "fullPath": "/api/admin/stats"
+        },
+        {
+          "method": "GET",
+          "path": "/dashboard-data",
+          "fullPath": "/api/admin/dashboard-data"
+        },
+        {
+          "method": "GET",
+          "path": "/users",
+          "fullPath": "/api/admin/users"
+        },
+        {
+          "method": "GET",
+          "path": "/hospitals",
+          "fullPath": "/api/admin/hospitals"
+        },
+        {
+          "method": "POST",
+          "path": "/hospitals/:id/verify",
+          "fullPath": "/api/admin/hospitals/:id/verify"
+        },
+        {
+          "method": "GET",
+          "path": "/requests",
+          "fullPath": "/api/admin/requests"
+        },
+        {
+          "method": "PATCH",
+          "path": "/requests/:id/status",
+          "fullPath": "/api/admin/requests/:id/status"
+        },
+        {
+          "method": "GET",
+          "path": "/donors",
+          "fullPath": "/api/admin/donors"
+        },
+        {
+          "method": "PATCH",
+          "path": "/donors/:id/verify",
+          "fullPath": "/api/admin/donors/:id/verify"
+        },
+        {
+          "method": "PATCH",
+          "path": "/donors/:id/status",
+          "fullPath": "/api/admin/donors/:id/status"
+        },
+        {
+          "method": "GET",
+          "path": "/facilities",
+          "fullPath": "/api/admin/facilities"
+        },
+        {
+          "method": "POST",
+          "path": "/hospitals/add",
+          "fullPath": "/api/admin/hospitals/add"
+        },
+        {
+          "method": "DELETE",
+          "path": "/facilities/:id",
+          "fullPath": "/api/admin/facilities/:id"
+        },
+        {
+          "method": "PATCH",
+          "path": "/users/:id/suspend",
+          "fullPath": "/api/admin/users/:id/suspend"
+        },
+        {
+          "method": "PATCH",
+          "path": "/users/:id/activate",
+          "fullPath": "/api/admin/users/:id/activate"
+        },
+        {
+          "method": "DELETE",
+          "path": "/users/:id",
+          "fullPath": "/api/admin/users/:id"
+        },
+        {
+          "method": "GET",
+          "path": "/export/:type",
+          "fullPath": "/api/admin/export/:type"
+        }
+      ],
+      "middleware": [
+        "isAuthenticated"
+      ],
+      "authentication": {
+        "requiresAuth": true,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "auth": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/auth.js",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/signup/send-otp",
+          "fullPath": "/auth/signup/send-otp"
+        },
+        {
+          "method": "POST",
+          "path": "/signup/verify-otp",
+          "fullPath": "/auth/signup/verify-otp"
+        },
+        {
+          "method": "POST",
+          "path": "/signin/send-otp",
+          "fullPath": "/auth/signin/send-otp"
+        },
+        {
+          "method": "POST",
+          "path": "/signin/verify-otp",
+          "fullPath": "/auth/signin/verify-otp"
+        },
+        {
+          "method": "GET",
+          "path": "/verify-email",
+          "fullPath": "/auth/verify-email"
+        },
+        {
+          "method": "GET",
+          "path": "/google",
+          "fullPath": "/auth/google"
+        },
+        {
+          "method": "GET",
+          "path": "/google/callback",
+          "fullPath": "/auth/google/callback"
+        },
+        {
+          "method": "POST",
+          "path": "/logout",
+          "fullPath": "/auth/logout"
+        },
+        {
+          "method": "GET",
+          "path": "/logout",
+          "fullPath": "/auth/logout"
+        },
+        {
+          "method": "GET",
+          "path": "/me",
+          "fullPath": "/auth/me"
+        }
+      ],
+      "middleware": [
+        "body('name')",
+        "body('email')",
+        "body('password')",
+        "body('otp')",
+        "validationResult",
+        "passport.authenticate",
+        "isAuthenticated"
+      ],
+      "authentication": {
+        "requiresAuth": true,
+        "requiresRole": false,
+        "hasOTP": true,
+        "hasValidation": true
+      }
+    },
+    "beds": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/beds.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/availability",
+          "fullPath": "/api/beds/availability"
+        },
+        {
+          "method": "PATCH",
+          "path": "/:facilityId/update",
+          "fullPath": "/api/beds/:facilityId/update"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "chat": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/chat.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/",
+          "fullPath": "/api/chat/"
+        },
+        {
+          "method": "GET",
+          "path": "/:chatId/messages",
+          "fullPath": "/api/chat/:chatId/messages"
+        },
+        {
+          "method": "POST",
+          "path": "/:chatId/message",
+          "fullPath": "/api/chat/:chatId/message"
+        },
+        {
+          "method": "POST",
+          "path": "/create",
+          "fullPath": "/api/chat/create"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": false,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "donor": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/donor.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/dashboard",
+          "fullPath": "/dashboard"
+        },
+        {
+          "method": "GET",
+          "path": "/stats",
+          "fullPath": "/stats"
+        }
+      ],
+      "middleware": [
+        "isAuthenticated"
+      ],
+      "authentication": {
+        "requiresAuth": true,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "donors": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/donors.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/nearby",
+          "fullPath": "/api/donors/nearby"
+        },
+        {
+          "method": "GET",
+          "path": "/",
+          "fullPath": "/api/donors/"
+        },
+        {
+          "method": "POST",
+          "path": "/register",
+          "fullPath": "/api/donors/register"
+        },
+        {
+          "method": "PUT",
+          "path": "/profile",
+          "fullPath": "/api/donors/profile"
+        },
+        {
+          "method": "GET",
+          "path": "/profile",
+          "fullPath": "/api/donors/profile"
+        },
+        {
+          "method": "PATCH",
+          "path": "/availability",
+          "fullPath": "/api/donors/availability"
+        },
+        {
+          "method": "GET",
+          "path": "/meta/blood-types",
+          "fullPath": "/api/donors/meta/blood-types"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": false,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "emergency": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/emergency.js",
+      "routes": [
+        {
+          "method": "POST",
+          "path": "/request",
+          "fullPath": "/api/emergency/request"
+        },
+        {
+          "method": "GET",
+          "path": "/nearby",
+          "fullPath": "/api/emergency/nearby"
+        },
+        {
+          "method": "GET",
+          "path": "/",
+          "fullPath": "/api/emergency/"
+        },
+        {
+          "method": "GET",
+          "path": "/:id",
+          "fullPath": "/api/emergency/:id"
+        },
+        {
+          "method": "POST",
+          "path": "/:id/respond",
+          "fullPath": "/api/emergency/:id/respond"
+        },
+        {
+          "method": "PATCH",
+          "path": "/:id/status",
+          "fullPath": "/api/emergency/:id/status"
+        },
+        {
+          "method": "GET",
+          "path": "/user/requests",
+          "fullPath": "/api/emergency/user/requests"
+        },
+        {
+          "method": "PUT",
+          "path": "/:id",
+          "fullPath": "/api/emergency/:id"
+        },
+        {
+          "method": "DELETE",
+          "path": "/:id",
+          "fullPath": "/api/emergency/:id"
+        },
+        {
+          "method": "GET",
+          "path": "/user/incoming-responses",
+          "fullPath": "/api/emergency/user/incoming-responses"
+        },
+        {
+          "method": "GET",
+          "path": "/user/outgoing-responses",
+          "fullPath": "/api/emergency/user/outgoing-responses"
+        },
+        {
+          "method": "GET",
+          "path": "/stats/overview",
+          "fullPath": "/api/emergency/stats/overview"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "facilities": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/facilities.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/nearby",
+          "fullPath": "/api/facilities/nearby"
+        },
+        {
+          "method": "GET",
+          "path": "/",
+          "fullPath": "/api/facilities/"
+        },
+        {
+          "method": "GET",
+          "path": "/:id",
+          "fullPath": "/api/facilities/:id"
+        },
+        {
+          "method": "POST",
+          "path": "/",
+          "fullPath": "/api/facilities/"
+        },
+        {
+          "method": "PUT",
+          "path": "/:id",
+          "fullPath": "/api/facilities/:id"
+        },
+        {
+          "method": "GET",
+          "path": "/meta/types-services",
+          "fullPath": "/api/facilities/meta/types-services"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "hospital": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/hospital.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/dashboard",
+          "fullPath": "/api/hospital/dashboard"
+        },
+        {
+          "method": "GET",
+          "path": "/stats",
+          "fullPath": "/api/hospital/stats"
+        }
+      ],
+      "middleware": [
+        "isAuthenticated"
+      ],
+      "authentication": {
+        "requiresAuth": true,
+        "requiresRole": true,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "sos": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/sos.js",
+      "routes": [
+        {
+          "method": "GET",
+          "path": "/contacts",
+          "fullPath": "/api/sos/contacts"
+        },
+        {
+          "method": "POST",
+          "path": "/contacts",
+          "fullPath": "/api/sos/contacts"
+        },
+        {
+          "method": "POST",
+          "path": "/alert",
+          "fullPath": "/api/sos/alert"
+        }
+      ],
+      "middleware": [],
+      "authentication": {
+        "requiresAuth": false,
+        "requiresRole": false,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    },
+    "user": {
+      "file": "/Users/manideepgonugunta/Desktop/test/routes/user.js",
+      "routes": [
+        {
+          "method": "PUT",
+          "path": "/profile",
+          "fullPath": "/api/user/profile"
+        },
+        {
+          "method": "PUT",
+          "path": "/change-password",
+          "fullPath": "/api/user/change-password"
+        },
+        {
+          "method": "POST",
+          "path": "/profile-picture",
+          "fullPath": "/api/user/profile-picture"
+        },
+        {
+          "method": "GET",
+          "path": "/profile",
+          "fullPath": "/api/user/profile"
+        },
+        {
+          "method": "POST",
+          "path": "/export-data",
+          "fullPath": "/api/user/export-data"
+        }
+      ],
+      "middleware": [
+        "isAuthenticated"
+      ],
+      "authentication": {
+        "requiresAuth": true,
+        "requiresRole": false,
+        "hasOTP": false,
+        "hasValidation": false
+      }
+    }
+  },
+  "authFlow": {
+    "OTP-Based Authentication": {
+      "signup": [
+        "POST /auth/signup/send-otp - Send OTP for registration",
+        "POST /auth/signup/verify-otp - Verify OTP and create account"
+      ],
+      "signin": [
+        "POST /auth/signin/send-otp - Send OTP for login",
+        "POST /auth/signin/verify-otp - Verify OTP and login"
+      ]
+    },
+    "OAuth Authentication": [
+      "GET /auth/google - Initiate Google OAuth",
+      "GET /auth/google/callback - Handle OAuth callback"
+    ],
+    "Session Management": [
+      "POST /auth/logout - Logout user",
+      "GET /auth/me - Get current user info"
+    ],
+    "Role-Based Redirects": {
+      "user": "/dashboard",
+      "donor": "/donor/dashboard",
+      "hospital": "/hospital/dashboard",
+      "admin": "/admin/dashboard"
+    }
+  },
+  "middleware": {
+    "Global Middleware": [
+      "cors() - Cross-origin resource sharing",
+      "express.json() - JSON body parser",
+      "express.urlencoded() - URL encoded parser",
+      "session() - Session management",
+      "passport.initialize() - Passport initialization",
+      "passport.session() - Passport session support"
+    ],
+    "Route-Specific Middleware": {
+      "Authentication": [
+        "passport.authenticate('local')",
+        "passport.authenticate('google')",
+        "req.isAuthenticated() check"
+      ],
+      "Validation": [
+        "body().isEmail() - Email validation",
+        "body().isLength() - Length validation",
+        "validationResult() - Error collection"
+      ],
+      "Authorization": [
+        "Role-based access control",
+        "Admin-only routes",
+        "Hospital-only routes"
+      ]
+    }
+  },
+  "security": {
+    "Authentication Security": {
+      "Multi-Factor": "✅ OTP-based 2FA implemented",
+      "Password Hashing": "✅ bcrypt with salt rounds",
+      "Session Security": "✅ Secure cookies, httpOnly, sameSite",
+      "OAuth Integration": "✅ Google OAuth 2.0"
+    },
+    "Input Validation": {
+      "Email Validation": "✅ express-validator",
+      "Password Strength": "✅ Minimum 6 characters",
+      "SQL Injection": "✅ Mongoose ODM protection",
+      "XSS Protection": "✅ Input sanitization"
+    },
+    "Authorization": {
+      "Role-Based Access": "✅ User, Donor, Hospital, Admin roles",
+      "Route Protection": "✅ Authentication middleware",
+      "Resource Ownership": "✅ User-specific data access"
+    }
+  },
+  "documentation": "# EMResource API Routes Documentation\n\nGenerated on: 2025-10-29T12:11:22.717Z\n\n## ADMIN Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/admin.js`\n\n### Endpoints\n\n- **GET** `/api/admin/dashboard`\n- **GET** `/api/admin/stats`\n- **GET** `/api/admin/dashboard-data`\n- **GET** `/api/admin/users`\n- **GET** `/api/admin/hospitals`\n- **POST** `/api/admin/hospitals/:id/verify`\n- **GET** `/api/admin/requests`\n- **PATCH** `/api/admin/requests/:id/status`\n- **GET** `/api/admin/donors`\n- **PATCH** `/api/admin/donors/:id/verify`\n- **PATCH** `/api/admin/donors/:id/status`\n- **GET** `/api/admin/facilities`\n- **POST** `/api/admin/hospitals/add`\n- **DELETE** `/api/admin/facilities/:id`\n- **PATCH** `/api/admin/users/:id/suspend`\n- **PATCH** `/api/admin/users/:id/activate`\n- **DELETE** `/api/admin/users/:id`\n- **GET** `/api/admin/export/:type`\n\n### Middleware\n- isAuthenticated\n\n### Authentication Requirements\n- ✅ requires auth\n- ✅ requires role\n\n---\n\n## AUTH Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/auth.js`\n\n### Endpoints\n\n- **POST** `/auth/signup/send-otp`\n- **POST** `/auth/signup/verify-otp`\n- **POST** `/auth/signin/send-otp`\n- **POST** `/auth/signin/verify-otp`\n- **GET** `/auth/verify-email`\n- **GET** `/auth/google`\n- **GET** `/auth/google/callback`\n- **POST** `/auth/logout`\n- **GET** `/auth/logout`\n- **GET** `/auth/me`\n\n### Middleware\n- body('name')\n- body('email')\n- body('password')\n- body('otp')\n- validationResult\n- passport.authenticate\n- isAuthenticated\n\n### Authentication Requirements\n- ✅ requires auth\n- ✅ has o t p\n- ✅ has validation\n\n---\n\n## BEDS Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/beds.js`\n\n### Endpoints\n\n- **GET** `/api/beds/availability`\n- **PATCH** `/api/beds/:facilityId/update`\n\n### Authentication Requirements\n- ✅ requires role\n\n---\n\n## CHAT Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/chat.js`\n\n### Endpoints\n\n- **GET** `/api/chat/`\n- **GET** `/api/chat/:chatId/messages`\n- **POST** `/api/chat/:chatId/message`\n- **POST** `/api/chat/create`\n\n---\n\n## DONOR Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/donor.js`\n\n### Endpoints\n\n- **GET** `/dashboard`\n- **GET** `/stats`\n\n### Middleware\n- isAuthenticated\n\n### Authentication Requirements\n- ✅ requires auth\n- ✅ requires role\n\n---\n\n## DONORS Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/donors.js`\n\n### Endpoints\n\n- **GET** `/api/donors/nearby`\n- **GET** `/api/donors/`\n- **POST** `/api/donors/register`\n- **PUT** `/api/donors/profile`\n- **GET** `/api/donors/profile`\n- **PATCH** `/api/donors/availability`\n- **GET** `/api/donors/meta/blood-types`\n\n---\n\n## EMERGENCY Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/emergency.js`\n\n### Endpoints\n\n- **POST** `/api/emergency/request`\n- **GET** `/api/emergency/nearby`\n- **GET** `/api/emergency/`\n- **GET** `/api/emergency/:id`\n- **POST** `/api/emergency/:id/respond`\n- **PATCH** `/api/emergency/:id/status`\n- **GET** `/api/emergency/user/requests`\n- **PUT** `/api/emergency/:id`\n- **DELETE** `/api/emergency/:id`\n- **GET** `/api/emergency/user/incoming-responses`\n- **GET** `/api/emergency/user/outgoing-responses`\n- **GET** `/api/emergency/stats/overview`\n\n### Authentication Requirements\n- ✅ requires role\n\n---\n\n## FACILITIES Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/facilities.js`\n\n### Endpoints\n\n- **GET** `/api/facilities/nearby`\n- **GET** `/api/facilities/`\n- **GET** `/api/facilities/:id`\n- **POST** `/api/facilities/`\n- **PUT** `/api/facilities/:id`\n- **GET** `/api/facilities/meta/types-services`\n\n### Authentication Requirements\n- ✅ requires role\n\n---\n\n## HOSPITAL Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/hospital.js`\n\n### Endpoints\n\n- **GET** `/api/hospital/dashboard`\n- **GET** `/api/hospital/stats`\n\n### Middleware\n- isAuthenticated\n\n### Authentication Requirements\n- ✅ requires auth\n- ✅ requires role\n\n---\n\n## SOS Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/sos.js`\n\n### Endpoints\n\n- **GET** `/api/sos/contacts`\n- **POST** `/api/sos/contacts`\n- **POST** `/api/sos/alert`\n\n---\n\n## USER Routes\n**File:** `/Users/manideepgonugunta/Desktop/test/routes/user.js`\n\n### Endpoints\n\n- **PUT** `/api/user/profile`\n- **PUT** `/api/user/change-password`\n- **POST** `/api/user/profile-picture`\n- **GET** `/api/user/profile`\n- **POST** `/api/user/export-data`\n\n### Middleware\n- isAuthenticated\n\n### Authentication Requirements\n- ✅ requires auth\n\n---\n\n"
+}

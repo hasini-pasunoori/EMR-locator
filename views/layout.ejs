@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('partials/head') %>
+    <link rel="stylesheet" href="/css/main.css">
+</head>
+<body>
+    <!-- Custom Cursor -->
+    <div class="cursor"></div>
+    <div class="cursor-follower"></div>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="loading-logo">
+            <i class="fas fa-heartbeat"></i>
+        </div>
+        <div class="loading-text">Loading Emergency Medical Resource Locator</div>
+        <div class="loading-progress">
+            <div class="loading-bar"></div>
+        </div>
+    </div>
+
+    <%- include('partials/navbar') %>
+
+    <main>
+        <%- body %>
+    </main>
+
+    <% if (!user) { %>
+        <%- include('partials/auth-modals') %>
+    <% } %>
+
+    <%- include('partials/scripts') %>
+</body>
+</html>

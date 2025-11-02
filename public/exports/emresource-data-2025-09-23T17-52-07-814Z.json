@@ -1,0 +1,94 @@
+{
+  "profile": {
+    "name": "Manideep Gonugunta",
+    "email": "manideepgonugunta1802@gmail.com",
+    "address": {
+      "country": "India"
+    },
+    "role": "user",
+    "isVerified": false,
+    "createdAt": "2025-09-21T18:27:31.221Z",
+    "updatedAt": "2025-09-21T18:27:31.221Z"
+  },
+  "donorInfo": {
+    "bloodType": "O+",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        80.50120261902394,
+        16.49390529814735
+      ]
+    },
+    "address": {
+      "street": "Pernamitta",
+      "city": "Ongole",
+      "state": "Andhra Pradesh",
+      "zipCode": "523255",
+      "country": "USA"
+    },
+    "medicalInfo": {
+      "isEligible": true,
+      "age": 21,
+      "weight": 62,
+      "medicalConditions": [],
+      "medications": [],
+      "allergies": []
+    },
+    "availability": {
+      "isAvailable": true,
+      "preferredTime": "morning",
+      "availableDays": []
+    },
+    "contact": {
+      "preferredContactMethod": "phone"
+    },
+    "emergencyContact": {
+      "name": "mani deep gonugunta",
+      "phone": "08885800887",
+      "relationship": "sibling"
+    },
+    "privacy": {
+      "showFullName": true,
+      "showExactLocation": false,
+      "maxDistanceToShow": 10,
+      "showPhone": true,
+      "showEmail": true,
+      "showLocation": true
+    },
+    "isVerified": false,
+    "status": "active",
+    "createdAt": "2025-09-23T17:25:33.547Z"
+  },
+  "emergencyRequests": [
+    {
+      "type": "blood",
+      "urgency": "medium",
+      "location": {
+        "type": "Point",
+        "coordinates": [
+          80.5011348364168,
+          16.49381976257218
+        ]
+      },
+      "address": {
+        "street": "Pernamitta",
+        "city": "Current Location",
+        "state": "Unknown",
+        "zipCode": "00000",
+        "country": "India"
+      },
+      "description": "xyx",
+      "status": "active",
+      "responses": [],
+      "createdAt": "2025-09-23T17:24:20.443Z"
+    }
+  ],
+  "myResponses": [],
+  "activityLog": {
+    "accountCreated": "2025-09-21T18:27:31.221Z",
+    "lastLogin": "2025-09-23T17:52:07.814Z",
+    "totalRequests": 1,
+    "totalResponses": 0,
+    "isDonor": true
+  }
+}

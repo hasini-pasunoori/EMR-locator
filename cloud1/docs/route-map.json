@@ -1,0 +1,55 @@
+{
+  "authentication": {
+    "prefix": "/auth",
+    "routes": [
+      "POST /signup/send-otp",
+      "POST /signup/verify-otp",
+      "POST /signin/send-otp",
+      "POST /signin/verify-otp",
+      "GET /google",
+      "GET /google/callback",
+      "POST /logout"
+    ]
+  },
+  "facilities": {
+    "prefix": "/api/facilities",
+    "routes": [
+      "GET /nearby",
+      "GET /",
+      "POST /",
+      "PUT /:id",
+      "DELETE /:id"
+    ]
+  },
+  "donors": {
+    "prefix": "/api/donors",
+    "routes": [
+      "GET /nearby",
+      "POST /register",
+      "GET /profile",
+      "PATCH /availability"
+    ]
+  },
+  "emergency": {
+    "prefix": "/api/emergency",
+    "routes": [
+      "POST /request",
+      "GET /nearby",
+      "POST /:id/respond",
+      "GET /stats/overview"
+    ]
+  },
+  "pages": {
+    "prefix": "/",
+    "routes": [
+      "GET /",
+      "GET /dashboard",
+      "GET /resource",
+      "GET /donor",
+      "GET /admin",
+      "GET /hospital",
+      "GET /beds",
+      "GET /chat"
+    ]
+  }
+}

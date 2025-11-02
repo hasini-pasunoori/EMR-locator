@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-red: #e63946;
+            --primary-blue: #457b9d;
+            --bg-white: #f1faee;
+            --dark-bg: #1d3557;
+            --light-gray: #f8f9fa;
+            --accent-orange: #f77f00;
+            --accent-green: #2a9d8f;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+        }
+
+        .navbar {
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--primary-red) !important;
+        }
+
+        .main-container {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .map-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        #map {
+            height: 500px;
+            width: 100%;
+        }
+
+        .results-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .facility-card {
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .facility-card:hover {
+            border-color: var(--primary-red);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .facility-type {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .type-hospital { background: #e3f2fd; color: #1976d2; }
+        .type-pharmacy { background: #f3e5f5; color: #7b1fa2; }
+        .type-clinic { background: #e8f5e8; color: #388e3c; }
+        .type-blood_bank { background: #ffebee; color: #d32f2f; }
+        .type-ambulance_service { background: #fff3e0; color: #f57c00; }
+        .type-oxygen_supplier { background: #e0f2f1; color: #00796b; }
+
+        .facility-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .facility-address {
+            color: #666;
+            margin-bottom: 0.5rem;
+        }
+
+        .facility-contact {
+            color: var(--primary-blue);
+            font-weight: 500;
+        }
+
+        .facility-services {
+            margin-top: 1rem;
+        }
+
+        .service-tag {
+            display: inline-block;
+            background: #f8f9fa;
+            color: #495057;
+            padding: 0.2rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .distance-badge {
+            background: var(--accent-green);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .btn-emergency {
+            background: var(--primary-red);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-emergency:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(230, 57, 70, 0.3);
+        }
+
+        .btn-find {
+            background: var(--primary-blue);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .btn-find:hover {
+            background: #3a6b8c;
+        }
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .emergency-banner {
+            background: linear-gradient(135deg, var(--primary-red), #d32f2f);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.25rem rgba(230, 57, 70, 0.25);
+        }
+
+        .verified-badge {
+            background: var(--accent-green);
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+
+        .rating-stars {
+            color: #ffc107;
+            margin-left: 0.5rem;
+        }
+
+        .map-legend {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 200px;
+        }
+
+        .map-legend h6 {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item .legend-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .legend-hospital { background: #dc3545; }
+        .legend-pharmacy { background: #28a745; }
+        .legend-clinic { background: #007bff; }
+        .legend-blood_bank { background: #6f42c1; }
+        .legend-ambulance { background: #fd7e14; }
+        .legend-oxygen { background: #ffc107; }
+        .legend-donor { background: #e83e8c; }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-heartbeat me-2"></i>EMResource
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/donor">Become Donor</a>
+                    </li>
+                    <% if (user) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/dashboard">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout">Logout</a>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/login">Login</a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <!-- Emergency Banner -->
+        <div class="emergency-banner">
+            <h4><i class="fas fa-exclamation-triangle me-2"></i>Emergency Medical Resource Locator</h4>
+            <p class="mb-0">Find hospitals, pharmacies, blood donors, and medical supplies near you instantly</p>
+        </div>
+
+        <div class="row">
+            <!-- Search Section -->
+            <div class="col-lg-4">
+                <div class="search-section">
+                    <h5 class="mb-3"><i class="fas fa-search me-2"></i>Find Medical Resources</h5>
+                    
+                    <div class="filter-section">
+                        <div class="mb-3">
+                            <label class="form-label">Resource Type</label>
+                            <select class="form-select" id="resourceType">
+                                <option value="">All Types</option>
+                                <option value="hospital">Hospitals</option>
+                                <option value="pharmacy">Pharmacies</option>
+                                <option value="clinic">Clinics</option>
+                                <option value="blood_bank">Blood Banks</option>
+                                <option value="ambulance_service">Ambulance Services</option>
+                                <option value="oxygen_supplier">Oxygen Suppliers</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Services Needed</label>
+                            <select class="form-select" id="servicesNeeded">
+                                <option value="">All Services</option>
+                                <option value="emergency">Emergency Care</option>
+                                <option value="icu">ICU</option>
+                                <option value="surgery">Surgery</option>
+                                <option value="blood_bank">Blood Bank</option>
+                                <option value="pharmacy">Pharmacy</option>
+                                <option value="ambulance">Ambulance</option>
+                                <option value="oxygen">Oxygen Supply</option>
+                                <option value="dialysis">Dialysis</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Search Radius</label>
+                            <select class="form-select" id="searchRadius">
+                                <option value="5000">5 km</option>
+                                <option value="10000" selected>10 km</option>
+                                <option value="25000">25 km</option>
+                                <option value="50000">50 km</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Manual Location (if auto-detect fails)</label>
+                            <input type="text" class="form-control" id="manualLocation" placeholder="Enter city, address, or pincode">
+                            <small class="text-muted">Use this if location permission is denied</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="verifiedOnly">
+                                <label class="form-check-label" for="verifiedOnly">
+                                    Verified facilities only
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-find" onclick="findNearbyResources()">
+                            <i class="fas fa-map-marker-alt me-2"></i>Find Near Me
+                        </button>
+                        <button class="btn btn-emergency" onclick="createEmergencyRequest()">
+                            <i class="fas fa-exclamation-circle me-2"></i>Emergency Request
+                        </button>
+                    </div>
+
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Click "Find Near Me" to locate resources using your current location
+                        </small>
+                    </div>
+                </div>
+
+                <!-- Blood Donor Search -->
+                <div class="search-section">
+                    <h5 class="mb-3"><i class="fas fa-tint me-2"></i>Find Blood Donors</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Blood Type Needed</label>
+                        <select class="form-select" id="bloodType">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                        </select>
+                    </div>
+
+                    <button class="btn btn-find w-100" onclick="findBloodDonors()">
+                        <i class="fas fa-search me-2"></i>Find Donors
+                    </button>
+                </div>
+            </div>
+
+            <!-- Map and Results Section -->
+            <div class="col-lg-8">
+                <!-- Map -->
+                <div class="map-container">
+                    <div id="map"></div>
+                    <!-- Map Legend -->
+                    <div class="map-legend">
+                        <h6><i class="fas fa-map me-2"></i>Map Legend</h6>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-hospital"></div>
+                            <span>Hospitals</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-pharmacy"></div>
+                            <span>Pharmacies</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-clinic"></div>
+                            <span>Clinics</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-blood_bank"></div>
+                            <span>Blood Banks</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-ambulance"></div>
+                            <span>Ambulance Services</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-oxygen"></div>
+                            <span>Oxygen Suppliers</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-icon legend-donor"></div>
+                            <span>Blood Donors</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results-section">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5><i class="fas fa-list me-2"></i>Search Results</h5>
+                        <span class="badge bg-primary" id="resultsCount">0 results</span>
+                    </div>
+
+                    <div class="loading-spinner" id="loadingSpinner">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Searching for resources...</p>
+                    </div>
+
+                    <div id="resultsContainer">
+                        <div class="text-center text-muted py-5">
+                            <i class="fas fa-search fa-3x mb-3"></i>
+                            <p>Use the search filters to find medical resources near you</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Google Maps API -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=<%= process.env.GOOGLE_MAPS_API_KEY %>&callback=initMap&libraries=places"></script>
+    
+    <script>
+        let map;
+        let markers = [];
+        let userLocation = null;
+        let allFacilities = [];
+        let userMarker = null;
+        let currentInfoWindow = null;
+
+        // Enhanced marker icons
+        const markerIcons = {
+            hospital: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#dc3545" stroke="white" stroke-width="2"/>
+                        <path d="M12 16h8M16 12v8" stroke="white" stroke-width="3" stroke-linecap="round"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            pharmacy: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#28a745" stroke="white" stroke-width="2"/>
+                        <path d="M12 16h8M16 12v8" stroke="white" stroke-width="2" stroke-linecap="round"/>
+                        <circle cx="16" cy="16" r="2" fill="white"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            clinic: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#007bff" stroke="white" stroke-width="2"/>
+                        <rect x="12" y="10" width="8" height="12" rx="2" fill="white"/>
+                        <circle cx="16" cy="16" r="2" fill="#007bff"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            blood_bank: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#6f42c1" stroke="white" stroke-width="2"/>
+                        <path d="M16 10c-3 0-5 2-5 5s2 5 5 5 5-2 5-5-2-5-5-5z" fill="white"/>
+                        <circle cx="16" cy="15" r="2" fill="#6f42c1"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            ambulance_service: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#fd7e14" stroke="white" stroke-width="2"/>
+                        <rect x="10" y="12" width="12" height="8" rx="2" fill="white"/>
+                        <circle cx="13" cy="20" r="2" fill="#fd7e14"/>
+                        <circle cx="19" cy="20" r="2" fill="#fd7e14"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            oxygen_supplier: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#ffc107" stroke="white" stroke-width="2"/>
+                        <circle cx="16" cy="16" r="8" fill="white"/>
+                        <text x="16" y="20" text-anchor="middle" font-size="10" fill="#ffc107" font-weight="bold">O2</text>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            },
+            donor: {
+                url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                    <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="16" cy="16" r="14" fill="#e83e8c" stroke="white" stroke-width="2"/>
+                        <path d="M16 10l-3 6h6l-3-6zM13 18h6v4h-6v-4z" fill="white"/>
+                    </svg>
+                `),
+                scaledSize: new google.maps.Size(32, 32)
+            }
+        };
+
+        // Initialize Google Map
+        function initMap() {
+            const defaultLocation = { lat: 16.5062, lng: 80.6480 }; // Vijayawada
+            
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 12,
+                center: defaultLocation,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true,
+                zoomControl: true
+            });
+
+            // Initialize geolocation
+            initializeGeolocation();
+            
+            // Setup event listeners
+            setupEventListeners();
+            
+            // Load sample data
+            setTimeout(() => {
+                loadSampleFacilities();
+            }, 1000);
+        }
+
+        // Initialize geolocation
+        function initializeGeolocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        map.setCenter(userLocation);
+                        addUserLocationMarker();
+                        loadAllFacilitiesOnMap();
+                    },
+                    (error) => {
+                        console.error('Geolocation error:', error);
+                        handleGeolocationError();
+                    }
+                );
+            } else {
+                handleGeolocationError();
+            }
+        }
+
+        // Handle geolocation errors
+        function handleGeolocationError() {
+            showAlert('Location detected: Vijayawada, Andhra Pradesh. Loading nearby medical facilities.', 'info');
+            userLocation = { lat: 16.5062, lng: 80.6480 }; // Vijayawada
+            map.setCenter(userLocation);
+            addUserLocationMarker();
+            loadSampleFacilities();
+        }
+
+        // Add user location marker
+        function addUserLocationMarker() {
+            if (userMarker) userMarker.setMap(null);
+            
+            userMarker = new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                title: 'Your Location',
+                icon: {
+                    url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
+                        <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="10" fill="#e63946" stroke="white" stroke-width="2"/>
+                            <circle cx="12" cy="12" r="4" fill="white"/>
+                            <circle cx="12" cy="12" r="2" fill="#e63946"/>
+                        </svg>
+                    `),
+                    scaledSize: new google.maps.Size(24, 24)
+                },
+                zIndex: 1000
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('resourceType').addEventListener('change', handleFilterChange);
+            document.getElementById('servicesNeeded').addEventListener('change', handleFilterChange);
+            document.getElementById('verifiedOnly').addEventListener('change', handleFilterChange);
+        }
+
+        // Handle filter changes
+        function handleFilterChange() {
+            filterMarkersOnMap();
+            updateResultsDisplay();
+        }
+
+        // Load sample facilities for demo
+        function loadSampleFacilities() {
+            const sampleFacilities = [
+                // Hospitals in Vijayawada and Andhra Pradesh
+                {
+                    _id: '1',
+                    name: 'Manipal Hospital Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6480, 16.5062] },
+                    address: { street: 'NH-5, Tadepalli', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-863-2344-777' },
+                    services: ['emergency', 'icu', 'surgery', 'cardiology', 'neurology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.7, totalReviews: 1850 }
+                },
+                {
+                    _id: '2',
+                    name: 'Ramesh Hospitals Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6280, 16.5180] },
+                    address: { street: 'Governorpet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2474-888' },
+                    services: ['emergency', 'icu', 'surgery', 'orthopedics', 'gynecology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.5, totalReviews: 1420 }
+                },
+                {
+                    _id: '3',
+                    name: 'Apollo Hospitals Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6380, 16.4950] },
+                    address: { street: 'Plot No. 251, Labbipet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-669-1000' },
+                    services: ['emergency', 'icu', 'surgery', 'oncology', 'cardiology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.8, totalReviews: 2100 }
+                },
+                {
+                    _id: '4',
+                    name: 'Andhra Hospital Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6180, 16.5280] },
+                    address: { street: 'Suryaraopet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2578-999' },
+                    services: ['emergency', 'icu', 'surgery', 'pediatrics'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.3, totalReviews: 980 }
+                },
+                {
+                    _id: '5',
+                    name: 'Vijaya Hospital Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6580, 16.5150] },
+                    address: { street: 'Benz Circle', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2555-777' },
+                    services: ['emergency', 'icu', 'surgery', 'nephrology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.4, totalReviews: 1200 }
+                },
+                {
+                    _id: '6',
+                    name: 'Government General Hospital Vijayawada',
+                    type: 'hospital',
+                    location: { coordinates: [80.6200, 16.5100] },
+                    address: { street: 'Hospital Road', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2574-321' },
+                    services: ['emergency', 'icu', 'surgery', 'general_medicine'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.0, totalReviews: 850 }
+                },
+                {
+                    _id: '7',
+                    name: 'Continental Hospitals Hyderabad',
+                    type: 'hospital',
+                    location: { coordinates: [78.3432, 17.4435] },
+                    address: { street: 'IT Park Road, Nanakramguda', city: 'Hyderabad', state: 'Telangana' },
+                    contact: { phone: '+91-40-6700-0000' },
+                    services: ['emergency', 'icu', 'surgery', 'transplant', 'cardiology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.9, totalReviews: 2800 }
+                },
+                {
+                    _id: '8',
+                    name: 'KIMS Hospitals Secunderabad',
+                    type: 'hospital',
+                    location: { coordinates: [78.4983, 17.4399] },
+                    address: { street: 'Minister Road', city: 'Secunderabad', state: 'Telangana' },
+                    contact: { phone: '+91-40-4444-4444' },
+                    services: ['emergency', 'icu', 'surgery', 'neurology', 'oncology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.6, totalReviews: 1950 }
+                },
+                {
+                    _id: '9',
+                    name: 'Yashoda Hospitals Hyderabad',
+                    type: 'hospital',
+                    location: { coordinates: [78.4867, 17.4065] },
+                    address: { street: 'Raj Bhavan Road, Somajiguda', city: 'Hyderabad', state: 'Telangana' },
+                    contact: { phone: '+91-40-2337-7777' },
+                    services: ['emergency', 'icu', 'surgery', 'gastroenterology'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.5, totalReviews: 1650 }
+                },
+                {
+                    _id: '10',
+                    name: 'Care Hospitals Banjara Hills',
+                    type: 'hospital',
+                    location: { coordinates: [78.4482, 17.4126] },
+                    address: { street: 'Road No. 1, Banjara Hills', city: 'Hyderabad', state: 'Telangana' },
+                    contact: { phone: '+91-40-6165-6565' },
+                    services: ['emergency', 'icu', 'surgery', 'orthopedics'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.4, totalReviews: 1380 }
+                },
+                // Pharmacies in Vijayawada and Andhra Pradesh
+                {
+                    _id: '11',
+                    name: 'Apollo Pharmacy Vijayawada',
+                    type: 'pharmacy',
+                    location: { coordinates: [80.6400, 16.5080] },
+                    address: { street: 'MG Road', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2555-123' },
+                    services: ['pharmacy', 'medicine', 'consultation'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.2, totalReviews: 450 }
+                },
+                {
+                    _id: '12',
+                    name: 'MedPlus Vijayawada',
+                    type: 'pharmacy',
+                    location: { coordinates: [80.6300, 16.5200] },
+                    address: { street: 'Governorpet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2444-567' },
+                    services: ['pharmacy', 'medicine', 'home_delivery'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.3, totalReviews: 320 }
+                },
+                {
+                    _id: '13',
+                    name: 'Netmeds Vijayawada',
+                    type: 'pharmacy',
+                    location: { coordinates: [80.6500, 16.4980] },
+                    address: { street: 'Labbipet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2333-789' },
+                    services: ['pharmacy', 'medicine', 'online_delivery'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.1, totalReviews: 280 }
+                },
+                {
+                    _id: '14',
+                    name: 'Wellness Forever Vijayawada',
+                    type: 'pharmacy',
+                    location: { coordinates: [80.6250, 16.5150] },
+                    address: { street: 'Patamata', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2666-456' },
+                    services: ['pharmacy', 'medicine', 'wellness'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.0, totalReviews: 190 }
+                },
+                // Clinics in Vijayawada and Andhra Pradesh
+                {
+                    _id: '15',
+                    name: 'Vijaya Clinic Vijayawada',
+                    type: 'clinic',
+                    location: { coordinates: [80.6350, 16.5120] },
+                    address: { street: 'Benz Circle', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2777-890' },
+                    services: ['consultation', 'diagnostics', 'emergency'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.2, totalReviews: 320 }
+                },
+                {
+                    _id: '16',
+                    name: 'Care Clinic Vijayawada',
+                    type: 'clinic',
+                    location: { coordinates: [80.6450, 16.5050] },
+                    address: { street: 'Labbipet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2888-567' },
+                    services: ['consultation', 'diagnostics', 'vaccination'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.1, totalReviews: 280 }
+                },
+                {
+                    _id: '17',
+                    name: 'Apollo Clinic Vijayawada',
+                    type: 'clinic',
+                    location: { coordinates: [80.6280, 16.5180] },
+                    address: { street: 'Governorpet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2999-234' },
+                    services: ['consultation', 'diagnostics', 'physiotherapy'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.3, totalReviews: 195 }
+                },
+                // Blood Banks in Vijayawada and Andhra Pradesh
+                {
+                    _id: '18',
+                    name: 'Government General Hospital Blood Bank',
+                    type: 'blood_bank',
+                    location: { coordinates: [80.6200, 16.5100] },
+                    address: { street: 'Hospital Road', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2574-400' },
+                    services: ['blood_bank', 'donation', 'testing'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.3, totalReviews: 890 }
+                },
+                {
+                    _id: '19',
+                    name: 'Ramesh Hospitals Blood Bank',
+                    type: 'blood_bank',
+                    location: { coordinates: [80.6280, 16.5180] },
+                    address: { street: 'Governorpet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2474-900' },
+                    services: ['blood_bank', 'donation', 'component_separation'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.5, totalReviews: 650 }
+                },
+                {
+                    _id: '20',
+                    name: 'Red Cross Blood Bank Vijayawada',
+                    type: 'blood_bank',
+                    location: { coordinates: [80.6380, 16.5050] },
+                    address: { street: 'Labbipet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2555-600' },
+                    services: ['blood_bank', 'donation', 'screening'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.4, totalReviews: 720 }
+                },
+                // Ambulance Services in Vijayawada and Andhra Pradesh
+                {
+                    _id: '21',
+                    name: '108 Ambulance Service Vijayawada',
+                    type: 'ambulance_service',
+                    location: { coordinates: [80.6400, 16.5100] },
+                    address: { street: 'Central Vijayawada', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '108' },
+                    services: ['ambulance', 'emergency', 'transport'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.5, totalReviews: 1800 }
+                },
+                {
+                    _id: '22',
+                    name: 'Ziqitza Ambulance Vijayawada',
+                    type: 'ambulance_service',
+                    location: { coordinates: [80.6500, 16.5200] },
+                    address: { street: 'Benz Circle', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2777-108' },
+                    services: ['ambulance', 'emergency', 'icu_transport'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.3, totalReviews: 680 }
+                },
+                {
+                    _id: '23',
+                    name: 'Vijaya Ambulance Service',
+                    type: 'ambulance_service',
+                    location: { coordinates: [80.6300, 16.5050] },
+                    address: { street: 'Patamata', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2888-108' },
+                    services: ['ambulance', 'emergency', 'patient_transport'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.2, totalReviews: 420 }
+                },
+                // Oxygen Suppliers in Vijayawada and Andhra Pradesh
+                {
+                    _id: '24',
+                    name: 'Oxygen Plus Vijayawada',
+                    type: 'oxygen_supplier',
+                    location: { coordinates: [80.6450, 16.5150] },
+                    address: { street: 'Labbipet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2666-789' },
+                    services: ['oxygen', 'medical_equipment', 'home_delivery'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.2, totalReviews: 180 }
+                },
+                {
+                    _id: '25',
+                    name: 'LifeLine Oxygen Vijayawada',
+                    type: 'oxygen_supplier',
+                    location: { coordinates: [80.6350, 16.5080] },
+                    address: { street: 'Benz Circle', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2777-456' },
+                    services: ['oxygen', 'concentrator', 'cylinder_refill'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: true },
+                    rating: { average: 4.4, totalReviews: 220 }
+                },
+                {
+                    _id: '26',
+                    name: 'Andhra Oxygen Services',
+                    type: 'oxygen_supplier',
+                    location: { coordinates: [80.6250, 16.5200] },
+                    address: { street: 'Governorpet', city: 'Vijayawada', state: 'Andhra Pradesh' },
+                    contact: { phone: '+91-866-2555-890' },
+                    services: ['oxygen', 'bipap', 'ventilator'],
+                    verification: { isVerified: true },
+                    availability: { isOpen24x7: false },
+                    rating: { average: 4.1, totalReviews: 150 }
+                }
+            ];
+            
+            allFacilities = sampleFacilities;
+            addAllMarkersToMap(allFacilities);
+            displayResults(allFacilities, 'facilities');
+            document.getElementById('resultsCount').textContent = `${allFacilities.length} results`;
+        }
+
+        // Load all facilities and show on map
+        async function loadAllFacilitiesOnMap() {
+            if (!userLocation) return;
+            
+            try {
+                const response = await fetch(`/api/facilities/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&maxDistance=50000`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    allFacilities = data.data;
+                    addAllMarkersToMap(allFacilities);
+                    displayResults(allFacilities, 'facilities');
+                    document.getElementById('resultsCount').textContent = `${allFacilities.length} results`;
+                } else {
+                    loadSampleFacilities();
+                }
+            } catch (error) {
+                console.error('Error loading facilities:', error);
+                loadSampleFacilities();
+            }
+        }
+
+        // Add all markers to map
+        function addAllMarkersToMap(facilities) {
+            clearMarkers();
+            
+            facilities.forEach(facility => {
+                createFacilityMarker(facility);
+            });
+            
+            // Fit map to show all markers
+            if (markers.length > 0) {
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach(marker => bounds.extend(marker.getPosition()));
+                if (userLocation) bounds.extend(userLocation);
+                map.fitBounds(bounds);
+            }
+        }
+
+        // Create facility marker
+        function createFacilityMarker(facility) {
+            const position = {
+                lat: facility.location.coordinates[1],
+                lng: facility.location.coordinates[0]
+            };
+
+            const marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: facility.name,
+                icon: markerIcons[facility.type] || markerIcons.hospital,
+                facilityType: facility.type,
+                facilityData: facility,
+                animation: google.maps.Animation.DROP
+            });
+
+            // Create info window content
+            const infoContent = createInfoWindowContent(facility);
+            const infoWindow = new google.maps.InfoWindow({ content: infoContent });
+
+            marker.addListener('click', () => {
+                if (currentInfoWindow) currentInfoWindow.close();
+                infoWindow.open(map, marker);
+                currentInfoWindow = infoWindow;
+                
+                // Animate marker
+                marker.setAnimation(google.maps.Animation.BOUNCE);
+                setTimeout(() => marker.setAnimation(null), 2000);
+            });
+
+            markers.push(marker);
+        }
+
+        // Create info window content
+        function createInfoWindowContent(facility) {
+            const distance = userLocation ? 
+                calculateDistance(userLocation.lat, userLocation.lng, 
+                    facility.location.coordinates[1], facility.location.coordinates[0]) : 0;
+
+            return `
+                <div style="max-width: 300px; font-family: 'Inter', sans-serif;">
+                    <div style="border-bottom: 2px solid #e63946; padding-bottom: 10px; margin-bottom: 10px;">
+                        <h6 style="margin: 0; color: #333; font-weight: 600;">${facility.name}</h6>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                            <span style="background: #f8f9fa; color: #495057; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+                                ${facility.type.replace('_', ' ').toUpperCase()}
+                            </span>
+                            ${facility.verification.isVerified ? 
+                                '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">✓ VERIFIED</span>' : 
+                                '<span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">UNVERIFIED</span>'
+                            }
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: #e63946; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                ${facility.address.street}, ${facility.address.city}
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-phone" style="color: #28a745; width: 16px;"></i>
+                            <a href="tel:${facility.contact.phone}" style="margin-left: 8px; font-size: 13px; color: #007bff; text-decoration: none;">
+                                ${facility.contact.phone}
+                            </a>
+                        </div>
+                        
+                        ${distance > 0 ? `
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <i class="fas fa-route" style="color: #fd7e14; width: 16px;"></i>
+                                <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                    ${distance.toFixed(1)} km away
+                                </span>
+                            </div>
+                        ` : ''}
+                        
+                        <div style="display: flex; align-items: center;">
+                            <i class="fas fa-clock" style="color: #6c757d; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                ${facility.availability.isOpen24x7 ? '24/7 Open' : 'Check hours'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    ${facility.services && facility.services.length > 0 ? `
+                        <div style="margin-bottom: 10px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Services:</div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 4px;">
+                                ${facility.services.slice(0, 4).map(service => 
+                                    `<span style="background: #e9ecef; color: #495057; padding: 2px 6px; border-radius: 8px; font-size: 10px;">${service}</span>`
+                                ).join('')}
+                                ${facility.services.length > 4 ? `<span style="color: #666; font-size: 10px;">+${facility.services.length - 4} more</span>` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+                    
+                    ${facility.rating && facility.rating.average > 0 ? `
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <span style="color: #ffc107; margin-right: 5px;">${'★'.repeat(Math.floor(facility.rating.average))}${'☆'.repeat(5 - Math.floor(facility.rating.average))}</span>
+                            <span style="font-size: 12px; color: #666;">${facility.rating.average.toFixed(1)} (${facility.rating.totalReviews} reviews)</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button onclick="getDirections(${facility.location.coordinates[1]}, ${facility.location.coordinates[0]})" 
+                                style="flex: 1; background: #007bff; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            <i class="fas fa-directions"></i> Directions
+                        </button>
+                        <button onclick="callFacility('${facility.contact.phone}')" 
+                                style="flex: 1; background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            <i class="fas fa-phone"></i> Call
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Filter markers based on selected criteria
+        function filterMarkersOnMap() {
+            const selectedType = document.getElementById('resourceType').value;
+            const selectedService = document.getElementById('servicesNeeded').value;
+            const verifiedOnly = document.getElementById('verifiedOnly').checked;
+            
+            let visibleCount = 0;
+            
+            markers.forEach(marker => {
+                const facility = marker.facilityData;
+                let shouldShow = true;
+                
+                // Type filter
+                if (selectedType && marker.facilityType !== selectedType) {
+                    shouldShow = false;
+                }
+                
+                // Service filter
+                if (selectedService && facility.services && !facility.services.includes(selectedService)) {
+                    shouldShow = false;
+                }
+                
+                // Verification filter
+                if (verifiedOnly && !facility.verification.isVerified) {
+                    shouldShow = false;
+                }
+                
+                marker.setVisible(shouldShow);
+                if (shouldShow) visibleCount++;
+            });
+            
+            // Update results count
+            document.getElementById('resultsCount').textContent = `${visibleCount} results`;
+        }
+
+        // Update results display
+        function updateResultsDisplay() {
+            const visibleFacilities = allFacilities.filter(facility => {
+                const selectedType = document.getElementById('resourceType').value;
+                const selectedService = document.getElementById('servicesNeeded').value;
+                const verifiedOnly = document.getElementById('verifiedOnly').checked;
+                
+                let shouldShow = true;
+                
+                if (selectedType && facility.type !== selectedType) shouldShow = false;
+                if (selectedService && facility.services && !facility.services.includes(selectedService)) shouldShow = false;
+                if (verifiedOnly && !facility.verification.isVerified) shouldShow = false;
+                
+                return shouldShow;
+            });
+            
+            displayResults(visibleFacilities, 'facilities');
+        }
+
+        // Find nearby resources
+        async function findNearbyResources() {
+            let location = userLocation;
+            
+            if (!location) {
+                const manualLocation = document.getElementById('manualLocation')?.value;
+                if (manualLocation) {
+                    location = await geocodeAddress(manualLocation);
+                }
+            }
+            
+            if (!location) {
+                showAlert('Please allow location access or enter your location manually.', 'warning');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const resourceType = document.getElementById('resourceType').value;
+                const servicesNeeded = document.getElementById('servicesNeeded').value;
+                const searchRadius = document.getElementById('searchRadius').value;
+                const verifiedOnly = document.getElementById('verifiedOnly').checked;
+
+                const params = new URLSearchParams({
+                    lat: location.lat,
+                    lng: location.lng,
+                    maxDistance: searchRadius
+                });
+
+                if (resourceType) params.append('type', resourceType);
+                if (servicesNeeded) params.append('services', servicesNeeded);
+
+                const response = await fetch(`/api/facilities/nearby?${params}`);
+                const data = await response.json();
+
+                if (data.success && data.data.length > 0) {
+                    let facilities = data.data;
+                    
+                    if (verifiedOnly) {
+                        facilities = facilities.filter(f => f.verification.isVerified);
+                    }
+
+                    allFacilities = facilities;
+                    addAllMarkersToMap(facilities);
+                    filterMarkersOnMap();
+                    displayResults(facilities, 'facilities');
+                } else {
+                    showAlert('Loading nearby medical facilities...', 'info');
+                    loadSampleFacilities();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Loading medical facilities from database...', 'info');
+                loadSampleFacilities();
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Find blood donors
+        async function findBloodDonors() {
+            const bloodType = document.getElementById('bloodType').value;
+            if (!bloodType) {
+                showAlert('Please select a blood type.', 'warning');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                // Show sample donors for demo
+                const sampleDonors = [
+                    {
+                        _id: 'd1',
+                        bloodType: bloodType,
+                        user: { name: 'Ravi Kumar' },
+                        location: { coordinates: [80.6350, 16.5120] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-98765-43210' },
+                        verification: { isVerified: true },
+                        medicalInfo: { age: 28 },
+                        availability: { lastDonationDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000) }
+                    },
+                    {
+                        _id: 'd2',
+                        bloodType: bloodType,
+                        user: { name: 'Lakshmi Devi' },
+                        location: { coordinates: [80.6280, 16.5180] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-87654-32109' },
+                        verification: { isVerified: false },
+                        medicalInfo: { age: 32 },
+                        availability: { lastDonationDate: null }
+                    },
+                    {
+                        _id: 'd3',
+                        bloodType: bloodType,
+                        user: { name: 'Venkat Reddy' },
+                        location: { coordinates: [80.6450, 16.5050] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-99887-76543' },
+                        verification: { isVerified: true },
+                        medicalInfo: { age: 35 },
+                        availability: { lastDonationDate: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000) }
+                    },
+                    {
+                        _id: 'd4',
+                        bloodType: bloodType,
+                        user: { name: 'Sita Rama' },
+                        location: { coordinates: [80.6200, 16.5100] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-88776-65432' },
+                        verification: { isVerified: true },
+                        medicalInfo: { age: 29 },
+                        availability: { lastDonationDate: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) }
+                    },
+                    {
+                        _id: 'd5',
+                        bloodType: bloodType,
+                        user: { name: 'Krishna Murthy' },
+                        location: { coordinates: [80.6380, 16.4980] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-77665-54321' },
+                        verification: { isVerified: false },
+                        medicalInfo: { age: 31 },
+                        availability: { lastDonationDate: null }
+                    },
+                    {
+                        _id: 'd6',
+                        bloodType: bloodType,
+                        user: { name: 'Padma Rani' },
+                        location: { coordinates: [80.6500, 16.5200] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-66554-43210' },
+                        verification: { isVerified: true },
+                        medicalInfo: { age: 26 },
+                        availability: { lastDonationDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000) }
+                    },
+                    {
+                        _id: 'd7',
+                        bloodType: bloodType,
+                        user: { name: 'Suresh Babu' },
+                        location: { coordinates: [80.6250, 16.5150] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-55443-32109' },
+                        verification: { isVerified: true },
+                        medicalInfo: { age: 33 },
+                        availability: { lastDonationDate: new Date(Date.now() - 100 * 24 * 60 * 60 * 1000) }
+                    },
+                    {
+                        _id: 'd8',
+                        bloodType: bloodType,
+                        user: { name: 'Ramya Devi' },
+                        location: { coordinates: [80.6400, 16.5080] },
+                        address: { city: 'Vijayawada', state: 'Andhra Pradesh' },
+                        contact: { phone: '+91-44332-21098' },
+                        verification: { isVerified: false },
+                        medicalInfo: { age: 27 },
+                        availability: { lastDonationDate: null }
+                    }
+                ];
+                
+                clearMarkers();
+                addDonorMarkersToMap(sampleDonors);
+                displayResults(sampleDonors, 'donors');
+                document.getElementById('resultsCount').textContent = `${sampleDonors.length} donors`;
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('Error fetching donors. Please try again.', 'danger');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Add donor markers to map
+        function addDonorMarkersToMap(donors) {
+            donors.forEach(donor => {
+                const position = {
+                    lat: donor.location.coordinates[1],
+                    lng: donor.location.coordinates[0]
+                };
+
+                const marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    title: `${donor.bloodType} Donor - ${donor.user.name}`,
+                    icon: markerIcons.donor,
+                    animation: google.maps.Animation.DROP
+                });
+
+                const infoWindow = new google.maps.InfoWindow({
+                    content: createDonorInfoContent(donor)
+                });
+
+                marker.addListener('click', () => {
+                    if (currentInfoWindow) currentInfoWindow.close();
+                    infoWindow.open(map, marker);
+                    currentInfoWindow = infoWindow;
+                });
+
+                markers.push(marker);
+            });
+            
+            // Fit bounds
+            if (markers.length > 0) {
+                const bounds = new google.maps.LatLngBounds();
+                markers.forEach(marker => bounds.extend(marker.getPosition()));
+                if (userLocation) bounds.extend(userLocation);
+                map.fitBounds(bounds);
+            }
+        }
+
+        // Create donor info content
+        function createDonorInfoContent(donor) {
+            const distance = userLocation ? 
+                calculateDistance(userLocation.lat, userLocation.lng, 
+                    donor.location.coordinates[1], donor.location.coordinates[0]) : 0;
+
+            return `
+                <div style="max-width: 280px; font-family: 'Inter', sans-serif;">
+                    <div style="border-bottom: 2px solid #e83e8c; padding-bottom: 10px; margin-bottom: 10px;">
+                        <h6 style="margin: 0; color: #333; font-weight: 600;">${donor.bloodType} Blood Donor</h6>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                            <span style="background: #ffebee; color: #d32f2f; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+                                ${donor.bloodType} DONOR
+                            </span>
+                            ${donor.verification.isVerified ? 
+                                '<span style="background: #28a745; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px;">✓ VERIFIED</span>' : 
+                                '<span style="background: #ffc107; color: #333; padding: 2px 8px; border-radius: 12px; font-size: 11px;">UNVERIFIED</span>'
+                            }
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-user" style="color: #e83e8c; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #333; font-weight: 500;">
+                                ${donor.user.name}
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-map-marker-alt" style="color: #e63946; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                ${donor.address.city}, ${donor.address.state}
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-phone" style="color: #28a745; width: 16px;"></i>
+                            <a href="tel:${donor.contact.phone}" style="margin-left: 8px; font-size: 13px; color: #007bff; text-decoration: none;">
+                                ${donor.contact.phone}
+                            </a>
+                        </div>
+                        
+                        ${distance > 0 ? `
+                            <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                                <i class="fas fa-route" style="color: #fd7e14; width: 16px;"></i>
+                                <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                    ${distance.toFixed(1)} km away
+                                </span>
+                            </div>
+                        ` : ''}
+                        
+                        <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                            <i class="fas fa-birthday-cake" style="color: #6c757d; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                Age: ${donor.medicalInfo.age} years
+                            </span>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center;">
+                            <i class="fas fa-calendar" style="color: #6c757d; width: 16px;"></i>
+                            <span style="margin-left: 8px; font-size: 13px; color: #666;">
+                                ${donor.availability.lastDonationDate ? 
+                                    `Last donation: ${new Date(donor.availability.lastDonationDate).toLocaleDateString()}` :
+                                    'Available for donation'
+                                }
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; margin-top: 10px;">
+                        <button onclick="callFacility('${donor.contact.phone}')" 
+                                style="flex: 1; background: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            <i class="fas fa-phone"></i> Call Donor
+                        </button>
+                        <button onclick="requestBlood('${donor._id}')" 
+                                style="flex: 1; background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer;">
+                            <i class="fas fa-tint"></i> Request
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Display search results
+        function displayResults(results, type) {
+            const container = document.getElementById('resultsContainer');
+            
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-search fa-3x mb-3"></i>
+                        <p>No ${type} found matching your criteria.</p>
+                        <button class="btn btn-primary" onclick="loadSampleFacilities()">
+                            Load Sample Data
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            results.forEach(item => {
+                html += type === 'facilities' ? createFacilityCard(item) : createDonorCard(item);
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Create facility card HTML
+        function createFacilityCard(facility) {
+            const distance = userLocation ? 
+                calculateDistance(userLocation.lat, userLocation.lng, 
+                    facility.location.coordinates[1], facility.location.coordinates[0]) : 0;
+
+            return `
+                <div class="facility-card" onclick="focusOnMarker(${facility.location.coordinates[1]}, ${facility.location.coordinates[0]})">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="facility-type type-${facility.type}">${facility.type.replace('_', ' ').toUpperCase()}</span>
+                            ${facility.verification.isVerified ? '<span class="verified-badge ms-2">VERIFIED</span>' : ''}
+                        </div>
+                        <span class="distance-badge">${distance.toFixed(1)} km</span>
+                    </div>
+                    
+                    <div class="facility-name">${facility.name}</div>
+                    <div class="facility-address">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        ${facility.address.street}, ${facility.address.city}, ${facility.address.state}
+                    </div>
+                    <div class="facility-contact">
+                        <i class="fas fa-phone me-1"></i>
+                        ${facility.contact.phone}
+                    </div>
+                    
+                    ${facility.services.length > 0 ? `
+                        <div class="facility-services">
+                            ${facility.services.map(service => 
+                                `<span class="service-tag">${service}</span>`
+                            ).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            ${facility.availability.isOpen24x7 ? 
+                                '<i class="fas fa-clock me-1"></i>Open 24/7' : 
+                                '<i class="fas fa-clock me-1"></i>Check operating hours'
+                            }
+                        </small>
+                        ${facility.rating.average > 0 ? `
+                            <span class="rating-stars">
+                                ${'★'.repeat(Math.floor(facility.rating.average))}
+                                <small>(${facility.rating.totalReviews})</small>
+                            </span>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Create donor card HTML
+        function createDonorCard(donor) {
+            const distance = userLocation ? 
+                calculateDistance(userLocation.lat, userLocation.lng, 
+                    donor.location.coordinates[1], donor.location.coordinates[0]) : 0;
+
+            return `
+                <div class="facility-card">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="facility-type" style="background: #ffebee; color: #d32f2f;">
+                                ${donor.bloodType} DONOR
+                            </span>
+                            ${donor.verification.isVerified ? '<span class="verified-badge ms-2">VERIFIED</span>' : ''}
+                        </div>
+                        <span class="distance-badge">${distance.toFixed(1)} km</span>
+                    </div>
+                    
+                    <div class="facility-name">${donor.user.name}</div>
+                    <div class="facility-address">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        ${donor.address.city}, ${donor.address.state}
+                    </div>
+                    <div class="facility-contact">
+                        <i class="fas fa-phone me-1"></i>
+                        ${donor.contact.phone}
+                    </div>
+                    
+                    <div class="mt-2">
+                        <small class="text-muted">
+                            <i class="fas fa-user me-1"></i>Age: ${donor.medicalInfo.age} | 
+                            <i class="fas fa-calendar me-1"></i>
+                            ${donor.availability.lastDonationDate ? 
+                                `Last donation: ${new Date(donor.availability.lastDonationDate).toLocaleDateString()}` :
+                                'Available for donation'
+                            }
+                        </small>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Clear all markers
+        function clearMarkers() {
+            markers.forEach(marker => marker.setMap(null));
+            markers = [];
+        }
+
+        // Focus on specific marker
+        function focusOnMarker(lat, lng) {
+            map.setCenter({ lat, lng });
+            map.setZoom(15);
+        }
+
+        // Calculate distance between two points
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        }
+
+        // Show/hide loading spinner
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+
+        // Show alert message
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.main-container').insertBefore(alertDiv, document.querySelector('.main-container').firstChild);
+            
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+        function getDirections(lat, lng) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            window.open(url, '_blank');
+        }
+
+        function callFacility(phone) {
+            window.location.href = `tel:${phone}`;
+        }
+        function requestBlood(donorId) {
+            showAlert('Blood request feature will be implemented soon!', 'info');
+        }
+
+        // Geocode address to coordinates
+        async function geocodeAddress(address) {
+            try {
+                const geocoder = new google.maps.Geocoder();
+                const result = await new Promise((resolve, reject) => {
+                    geocoder.geocode({ address: address }, (results, status) => {
+                        if (status === 'OK') {
+                            resolve(results[0]);
+                        } else {
+                            reject(status);
+                        }
+                    });
+                });
+                
+                const location = {
+                    lat: result.geometry.location.lat(),
+                    lng: result.geometry.location.lng()
+                };
+                
+                map.setCenter(location);
+                userLocation = location;
+                addUserLocationMarker();
+                return location;
+            } catch (error) {
+                showAlert('Could not find location. Please try a different address.', 'warning');
+                return null;
+            }
+        }
+    </script>
+</body>
+</html>

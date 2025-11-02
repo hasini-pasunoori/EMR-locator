@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Dashboard - EMResource</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar { min-height: 100vh; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); }
+        .sidebar .nav-link { color: rgba(255,255,255,0.8); padding: 12px 20px; }
+        .sidebar .nav-link:hover, .sidebar .nav-link.active { color: white; background: rgba(255,255,255,0.1); }
+        .stat-card { border-left: 4px solid; transition: transform 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white">Hospital Panel</h4>
+                        <small class="text-light">EMResource</small>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#overview">
+                                <i class="fas fa-tachometer-alt me-2"></i>Overview
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#beds">
+                                <i class="fas fa-bed me-2"></i>Bed Management
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#requests">
+                                <i class="fas fa-ambulance me-2"></i>Emergency Requests
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#profile">
+                                <i class="fas fa-hospital me-2"></i>Hospital Profile
+                            </a>
+                        </li>
+                        <li class="nav-item mt-3">
+                            <a class="nav-link" href="/settings">
+                                <i class="fas fa-cog me-2"></i>Settings
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Hospital Dashboard</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button class="btn btn-sm btn-outline-secondary" onclick="refreshData()">
+                            <i class="fas fa-sync-alt me-1"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Overview Section -->
+                <div id="overview" class="section">
+                    <div class="row mb-4">
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #007bff;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Total Beds</h6>
+                                            <h3 class="mb-0" id="totalBeds">-</h3>
+                                        </div>
+                                        <i class="fas fa-bed fa-2x text-primary"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #28a745;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Available Beds</h6>
+                                            <h3 class="mb-0" id="availableBeds">-</h3>
+                                        </div>
+                                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #dc3545;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">ICU Beds</h6>
+                                            <h3 class="mb-0" id="icuBeds">-</h3>
+                                        </div>
+                                        <i class="fas fa-heartbeat fa-2x text-danger"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card stat-card" style="border-color: #ffc107;">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <h6 class="card-title text-muted">Ventilators</h6>
+                                            <h3 class="mb-0" id="ventilators">-</h3>
+                                        </div>
+                                        <i class="fas fa-lungs fa-2x text-warning"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bed Management Section -->
+                <div id="beds" class="section d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3>Bed Management</h3>
+                        <button class="btn btn-primary" onclick="updateBedCount()">
+                            <i class="fas fa-edit me-1"></i>Update Bed Count
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Current Bed Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="bedUpdateForm">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Total Beds</label>
+                                                <input type="number" class="form-control" id="totalBedsInput" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Available Beds</label>
+                                                <input type="number" class="form-control" id="availableBedsInput" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">ICU Beds</label>
+                                                <input type="number" class="form-control" id="icuBedsInput" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Available ICU</label>
+                                                <input type="number" class="form-control" id="availableIcuInput" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Ventilators</label>
+                                                <input type="number" class="form-control" id="ventilatorsInput" min="0">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Available Ventilators</label>
+                                                <input type="number" class="form-control" id="availableVentilatorsInput" min="0">
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Update Bed Status</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5>Occupancy Rate</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="occupancyChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emergency Requests Section -->
+                <div id="requests" class="section d-none">
+                    <h3>Emergency Requests</h3>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Patient</th>
+                                    <th>Type</th>
+                                    <th>Priority</th>
+                                    <th>Distance</th>
+                                    <th>Time</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestsTable">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Hospital Profile Section -->
+                <div id="profile" class="section d-none">
+                    <h3>Hospital Profile</h3>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="hospitalProfileForm">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Hospital Name</label>
+                                        <input type="text" class="form-control" id="hospitalName" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Contact Phone</label>
+                                        <input type="tel" class="form-control" id="hospitalPhone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Emergency Phone</label>
+                                        <input type="tel" class="form-control" id="emergencyPhone" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" class="form-control" id="hospitalEmail">
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Address</label>
+                                        <textarea class="form-control" id="hospitalAddress" rows="3"></textarea>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        <label class="form-label">Services Offered</label>
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="emergency" value="emergency">
+                                                    <label class="form-check-label" for="emergency">Emergency</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="icu" value="icu">
+                                                    <label class="form-check-label" for="icu">ICU</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="surgery" value="surgery">
+                                                    <label class="form-check-label" for="surgery">Surgery</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="cardiology" value="cardiology">
+                                                    <label class="form-check-label" for="cardiology">Cardiology</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Profile</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                if (link.getAttribute('href').startsWith('#')) {
+                    e.preventDefault();
+                    const target = link.getAttribute('href').substring(1);
+                    showSection(target);
+                    
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            if (sectionId === 'overview') loadOverview();
+            else if (sectionId === 'beds') loadBedManagement();
+            else if (sectionId === 'requests') loadRequests();
+            else if (sectionId === 'profile') loadProfile();
+        }
+
+        async function loadOverview() {
+            try {
+                const response = await fetch('/api/hospital/stats');
+                const data = await response.json();
+                
+                if (data.success && data.hospital) {
+                    const capacity = data.hospital.capacity || {};
+                    document.getElementById('totalBeds').textContent = capacity.totalBeds || 0;
+                    document.getElementById('availableBeds').textContent = capacity.availableBeds || 0;
+                    document.getElementById('icuBeds').textContent = capacity.availableIcuBeds || 0;
+                    document.getElementById('ventilators').textContent = capacity.availableVentilators || 0;
+                }
+            } catch (error) {
+                console.error('Error loading overview:', error);
+            }
+        }
+
+        async function loadBedManagement() {
+            // Load current bed data into form
+            try {
+                const response = await fetch('/api/hospital/stats');
+                const data = await response.json();
+                
+                if (data.success && data.hospital) {
+                    const capacity = data.hospital.capacity || {};
+                    document.getElementById('totalBedsInput').value = capacity.totalBeds || 0;
+                    document.getElementById('availableBedsInput').value = capacity.availableBeds || 0;
+                    document.getElementById('icuBedsInput').value = capacity.icuBeds || 0;
+                    document.getElementById('availableIcuInput').value = capacity.availableIcuBeds || 0;
+                    document.getElementById('ventilatorsInput').value = capacity.ventilators || 0;
+                    document.getElementById('availableVentilatorsInput').value = capacity.availableVentilators || 0;
+                }
+            } catch (error) {
+                console.error('Error loading bed data:', error);
+            }
+        }
+
+        // Bed update form handler
+        document.getElementById('bedUpdateForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const bedData = {
+                totalBeds: parseInt(document.getElementById('totalBedsInput').value),
+                availableBeds: parseInt(document.getElementById('availableBedsInput').value),
+                icuBeds: parseInt(document.getElementById('icuBedsInput').value),
+                availableIcuBeds: parseInt(document.getElementById('availableIcuInput').value),
+                ventilators: parseInt(document.getElementById('ventilatorsInput').value),
+                availableVentilators: parseInt(document.getElementById('availableVentilatorsInput').value)
+            };
+
+            try {
+                const response = await fetch('/api/beds/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bedData)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Bed status updated successfully');
+                    loadOverview();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating beds:', error);
+                alert('Error updating bed status');
+            }
+        });
+
+        function refreshData() {
+            const activeSection = document.querySelector('.nav-link.active').getAttribute('href').substring(1);
+            showSection(activeSection);
+        }
+
+        // Initialize
+        loadOverview();
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-red: #e63946; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fa; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { font-weight: 700; color: var(--primary-red) !important; }
+        .main-container { margin-top: 80px; padding: 2rem; }
+        .stat-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-heartbeat me-2"></i>EMResource</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/settings">Settings</a>
+                <a class="nav-link" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <h2 class="mb-4">Analytics Dashboard</h2>
+        
+        <div class="row" id="statsContainer">
+            <div class="col-md-3 mb-4">
+                <div class="stat-card text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    <p class="mt-2">Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', loadAnalytics);
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/emergency/stats/overview');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('statsContainer').innerHTML = `
+                        <div class="col-md-3 mb-4">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h3>${stats.activeRequests}</h3>
+                                <p>Active Requests</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                <h3>${stats.fulfilledRequests}</h3>
+                                <p>Fulfilled Requests</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-heartbeat fa-2x text-danger mb-2"></i>
+                                <h3>${stats.criticalRequests}</h3>
+                                <p>Critical Requests</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-4">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-users fa-2x text-info mb-2"></i>
+                                <h3>${stats.availableDonors}</h3>
+                                <p>Available Donors</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --primary-red: #e63946; }
+        body { font-family: 'Inter', sans-serif; background: #f8f9fa; }
+        .navbar { background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .navbar-brand { font-weight: 700; color: var(--primary-red) !important; }
+        .main-container { margin-top: 80px; padding: 2rem; }
+        .stat-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .table-container { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .btn-primary { background: var(--primary-red); border-color: var(--primary-red); }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fas fa-heartbeat me-2"></i>EMResource Admin</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+                <a class="nav-link" href="/auth/logout">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-container">
+        <h2 class="mb-4">Admin Dashboard</h2>
+        
+        <!-- Stats Cards -->
+        <div class="row mb-4" id="statsContainer">
+            <div class="col-md-3 mb-3">
+                <div class="stat-card text-center">
+                    <i class="fas fa-spinner fa-spin fa-2x text-muted"></i>
+                    <p class="mt-2">Loading...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <ul class="nav nav-tabs mb-4" id="adminTabs">
+            <li class="nav-item">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#requests">Emergency Requests</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#donors">Blood Donors</button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#facilities">Medical Facilities</button>
+            </li>
+        </ul>
+
+        <!-- Tab Content -->
+        <div class="tab-content">
+            <!-- Emergency Requests Tab -->
+            <div class="tab-pane fade show active" id="requests">
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Emergency Requests Management</h5>
+                        <select class="form-select w-auto" id="requestStatusFilter">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="fulfilled">Fulfilled</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Requester</th>
+                                    <th>Urgency</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestsTableBody">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Donors Tab -->
+            <div class="tab-pane fade" id="donors">
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Blood Donors Management</h5>
+                        <div class="d-flex gap-2">
+                            <select class="form-select" id="donorVerifiedFilter">
+                                <option value="">All Verification</option>
+                                <option value="true">Verified</option>
+                                <option value="false">Unverified</option>
+                            </select>
+                            <select class="form-select" id="donorActiveFilter">
+                                <option value="">All Status</option>
+                                <option value="true">Active</option>
+                                <option value="false">Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Blood Type</th>
+                                    <th>Contact</th>
+                                    <th>Verified</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donorsTableBody">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Facilities Tab -->
+            <div class="tab-pane fade" id="facilities">
+                <div class="table-container">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5>Medical Facilities Management</h5>
+                        <select class="form-select w-auto" id="facilityTypeFilter">
+                            <option value="">All Types</option>
+                            <option value="hospital">Hospitals</option>
+                            <option value="pharmacy">Pharmacies</option>
+                            <option value="blood_bank">Blood Banks</option>
+                            <option value="clinic">Clinics</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Location</th>
+                                    <th>Contact</th>
+                                    <th>Verified</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="facilitiesTableBody">
+                                <tr><td colspan="6" class="text-center">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardStats();
+            loadRequests();
+            
+            // Tab change handlers
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.addEventListener('shown.bs.tab', function(e) {
+                    const target = e.target.getAttribute('data-bs-target');
+                    if (target === '#donors') loadDonors();
+                    else if (target === '#facilities') loadFacilities();
+                });
+            });
+
+            // Filter handlers
+            document.getElementById('requestStatusFilter').addEventListener('change', loadRequests);
+            document.getElementById('donorVerifiedFilter').addEventListener('change', loadDonors);
+            document.getElementById('donorActiveFilter').addEventListener('change', loadDonors);
+            document.getElementById('facilityTypeFilter').addEventListener('change', loadFacilities);
+        });
+
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch('/api/admin/dashboard-data');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const stats = data.data;
+                    document.getElementById('statsContainer').innerHTML = `
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                                <h3>${stats.activeRequests}</h3>
+                                <p>Active Requests</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-tint fa-2x text-danger mb-2"></i>
+                                <h3>${stats.totalDonors}</h3>
+                                <p>Blood Donors</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-hospital fa-2x text-info mb-2"></i>
+                                <h3>${stats.totalFacilities}</h3>
+                                <p>Medical Facilities</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="stat-card text-center">
+                                <i class="fas fa-users fa-2x text-success mb-2"></i>
+                                <h3>${stats.totalUsers}</h3>
+                                <p>Total Users</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        async function loadRequests() {
+            const status = document.getElementById('requestStatusFilter').value;
+            const params = status ? `?status=${status}` : '';
+            
+            try {
+                const response = await fetch(`/api/admin/requests${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tbody = document.getElementById('requestsTableBody');
+                    tbody.innerHTML = data.data.map(req => `
+                        <tr>
+                            <td><span class="badge bg-primary">${req.type.toUpperCase()}</span></td>
+                            <td>${req.requester.name}<br><small>${req.requester.email}</small></td>
+                            <td><span class="badge bg-${req.urgency === 'critical' ? 'danger' : req.urgency === 'high' ? 'warning' : 'info'}">${req.urgency}</span></td>
+                            <td><span class="badge bg-${req.status === 'active' ? 'success' : 'secondary'}">${req.status}</span></td>
+                            <td>${new Date(req.createdAt).toLocaleDateString()}</td>
+                            <td>
+                                <select class="form-select form-select-sm" onchange="updateRequestStatus('${req._id}', this.value)">
+                                    <option value="active" ${req.status === 'active' ? 'selected' : ''}>Active</option>
+                                    <option value="fulfilled" ${req.status === 'fulfilled' ? 'selected' : ''}>Fulfilled</option>
+                                    <option value="cancelled" ${req.status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading requests:', error);
+            }
+        }
+
+        async function loadDonors() {
+            const verified = document.getElementById('donorVerifiedFilter').value;
+            const active = document.getElementById('donorActiveFilter').value;
+            const params = new URLSearchParams();
+            if (verified) params.append('verified', verified);
+            if (active) params.append('active', active);
+            
+            try {
+                const response = await fetch(`/api/admin/donors?${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tbody = document.getElementById('donorsTableBody');
+                    tbody.innerHTML = data.data.map(donor => `
+                        <tr>
+                            <td>${donor.user.name}</td>
+                            <td><span class="badge bg-danger">${donor.bloodType}</span></td>
+                            <td>${donor.contact.phone}<br><small>${donor.user.email}</small></td>
+                            <td>
+                                <button class="btn btn-sm ${donor.verification.isVerified ? 'btn-success' : 'btn-outline-warning'}" 
+                                        onclick="toggleDonorVerification('${donor._id}', ${!donor.verification.isVerified})">
+                                    ${donor.verification.isVerified ? 'Verified' : 'Unverified'}
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm ${donor.isActive ? 'btn-success' : 'btn-outline-danger'}" 
+                                        onclick="toggleDonorStatus('${donor._id}', ${!donor.isActive})">
+                                    ${donor.isActive ? 'Active' : 'Inactive'}
+                                </button>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="viewDonorDetails('${donor._id}')">View</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading donors:', error);
+            }
+        }
+
+        async function loadFacilities() {
+            const type = document.getElementById('facilityTypeFilter').value;
+            const params = type ? `?type=${type}` : '';
+            
+            try {
+                const response = await fetch(`/api/admin/facilities${params}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const tbody = document.getElementById('facilitiesTableBody');
+                    tbody.innerHTML = data.data.map(facility => `
+                        <tr>
+                            <td>${facility.name}</td>
+                            <td><span class="badge bg-info">${facility.type.replace('_', ' ').toUpperCase()}</span></td>
+                            <td>${facility.address.city}, ${facility.address.state}</td>
+                            <td>${facility.contact.phone}</td>
+                            <td><span class="badge bg-${facility.isVerified ? 'success' : 'warning'}">${facility.isVerified ? 'Verified' : 'Unverified'}</span></td>
+                            <td>
+                                <button class="btn btn-sm btn-danger" onclick="deleteFacility('${facility._id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading facilities:', error);
+            }
+        }
+
+        async function updateRequestStatus(id, status) {
+            try {
+                const response = await fetch(`/api/admin/requests/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+                
+                if (response.ok) {
+                    loadRequests();
+                    loadDashboardStats();
+                }
+            } catch (error) {
+                console.error('Error updating request:', error);
+            }
+        }
+
+        async function toggleDonorVerification(id, isVerified) {
+            try {
+                const response = await fetch(`/api/admin/donors/${id}/verify`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isVerified })
+                });
+                
+                if (response.ok) {
+                    loadDonors();
+                }
+            } catch (error) {
+                console.error('Error updating donor verification:', error);
+            }
+        }
+
+        async function toggleDonorStatus(id, isActive) {
+            try {
+                const response = await fetch(`/api/admin/donors/${id}/status`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ isActive })
+                });
+                
+                if (response.ok) {
+                    loadDonors();
+                }
+            } catch (error) {
+                console.error('Error updating donor status:', error);
+            }
+        }
+
+        async function deleteFacility(id) {
+            if (confirm('Are you sure you want to delete this facility?')) {
+                try {
+                    const response = await fetch(`/api/admin/facilities/${id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    if (response.ok) {
+                        loadFacilities();
+                        loadDashboardStats();
+                    }
+                } catch (error) {
+                    console.error('Error deleting facility:', error);
+                }
+            }
+        }
+    </script>
+</body>
+</html>

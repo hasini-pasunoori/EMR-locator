@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMResource - Settings</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-red: #e63946;
+            --primary-blue: #457b9d;
+            --bg-white: #f1faee;
+            --dark-bg: #1d3557;
+            --light-gray: #f8f9fa;
+            --accent-orange: #f77f00;
+            --accent-green: #2a9d8f;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-light: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --gradient-emergency: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            --gradient-medical: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            --gradient-success: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            --neon-glow: 0 0 20px rgba(230, 57, 70, 0.6);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--primary-red) !important;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-weight: 500;
+            margin: 0 1rem;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-red) !important;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--primary-red);
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+            left: 0;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-auth {
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-signin {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .btn-signin:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-signup {
+            background: var(--gradient-emergency);
+            border: none;
+            color: white;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(230, 57, 70, 0.3);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+            padding-top: 76px;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            height: calc(100vh - 76px);
+            position: fixed;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--gradient-emergency);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 1rem;
+        }
+
+        .user-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+            color: white;
+        }
+
+        .user-info p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 0.8rem 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(230, 57, 70, 0.1);
+            color: var(--primary-red);
+        }
+
+        .sidebar-menu i {
+            margin-right: 0.8rem;
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .emergency-button {
+            margin-top: 2rem;
+        }
+
+        .btn-emergency {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-emergency);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .btn-emergency:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(230, 57, 70, 0.4);
+        }
+
+        .btn-emergency i {
+            margin-right: 0.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            margin-left: 280px;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff 0%, var(--primary-red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Settings Page Styles */
+        .settings-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 0.8rem;
+            color: var(--primary-red);
+        }
+
+        .settings-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .settings-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+        }
+
+        .form-control:focus {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 0.25rem rgba(230, 57, 70, 0.25);
+            color: white;
+        }
+
+        .form-check-input {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-red);
+            border-color: var(--primary-red);
+        }
+
+        .form-check-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .btn-save {
+            background: var(--gradient-emergency);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(230, 57, 70, 0.3);
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-red);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        /* Alert styles */
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .alert-warning {
+            background: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border-left: 4px solid #ffc107;
+        }
+
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Button styles */
+        .btn-outline-danger, .btn-outline-warning {
+            border-radius: 10px;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-danger {
+            border: 2px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-outline-warning {
+            border: 2px solid #ffc107;
+            color: #ffc107;
+        }
+
+        .btn-outline-warning:hover {
+            background: #ffc107;
+            color: black;
+        }
+
+        /* Modal styles */
+        .modal-content {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            color: white;
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-close {
+            filter: invert(1);
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 220px;
+            }
+            
+            .main-content {
+                margin-left: 220px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+                margin-bottom: 1rem;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .auth-buttons {
+                display: none;
+            }
+            
+            .mobile-auth {
+                display: block !important;
+            }
+        }
+
+        .mobile-auth {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-heartbeat me-2"></i>EMResource
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="map.html">Resources Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Emergency</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="settings.html">Settings</a>
+                    </li>
+                </ul>
+                
+                <div class="auth-buttons ms-3">
+                    <button class="btn btn-auth btn-signout">
+                        <i class="fas fa-sign-out-alt me-1"></i> Sign Out
+                    </button>
+                </div>
+                
+                <div class="mobile-auth">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">Sign Out</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Dashboard Layout -->
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="user-avatar">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="user-info">
+                    <h4>John Doe</h4>
+                    <p>New York, USA</p>
+                </div>
+            </div>
+            
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                <li><a href="map.html"><i class="fas fa-map-marker-alt"></i> Resources Map</a></li>
+                <li><a href="emergency-contacts.html"><i class="fas fa-users"></i> Emergency Contacts</a></li>
+                <li><a href="settings.html" class="active"><i class="fas fa-cog"></i> Settings</a></li>
+                <li><a href="#"><i class="fas fa-heartbeat"></i> Medical Profile</a></li>
+                <li><a href="#"><i class="fas fa-hand-holding-heart"></i> Donor Status</a></li>
+                <li><a href="#"><i class="fas fa-history"></i> Recent Searches</a></li>
+                <li><a href="#"><i class="fas fa-star"></i> Saved Locations</a></li>
+            </ul>
+            
+            <div class="emergency-button">
+                <button class="btn btn-emergency">
+                    <i class="fas fa-plus-circle"></i> Emergency SOS
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Settings</h1>
+            </div>
+            
+            <!-- Account Settings -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-user-cog"></i> Account Settings</h2>
+                
+                <div class="settings-card">
+                    <form>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="firstName" class="form-label">First Name</label>
+                                <input type="text" class="form-control" id="firstName" value="John">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="lastName" class="form-label">Last Name</label>
+                                <input type="text" class="form-control" id="lastName" value="Doe">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" value="john.doe@example.com">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="phone" class="form-label">Phone Number</label>
+                            <input type="tel" class="form-control" id="phone" value="+1 (555) 123-4567">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="location" class="form-label">Default Location</label>
+                            <input type="text" class="form-control" id="location" value="New York, USA">
+                        </div>
+                        
+                        <button type="submit" class="btn btn-save">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Notification Settings -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-bell"></i> Notification Settings</h2>
+                
+                <div class="settings-card">
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Emergency Alerts</h5>
+                            <p class="mb-0 text-muted">Receive notifications about emergencies in your area</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Resource Availability</h5>
+                            <p class="mb-0 text-muted">Get updates when medical resources become available</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Appointment Reminders</h5>
+                            <p class="mb-0 text-muted">Receive reminders for your medical appointments</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Email Notifications</h5>
+                            <p class="mb-0 text-muted">Receive important updates via email</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-save">Save Preferences</button>
+                </div>
+            </div>
+            
+            <!-- Privacy & Security -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-shield-alt"></i> Privacy & Security</h2>
+                
+                <div class="settings-card">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword">
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="newPassword" class="form-label">New Password</label>
+                            <input type="password" class="form-control" id="newPassword">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                            <input type="password" class="form-control" id="confirmPassword">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Two-Factor Authentication</h5>
+                            <p class="mb-0 text-muted">Add an extra layer of security to your account</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Location Sharing</h5>
+                            <p class="mb-0 text-muted">Allow sharing your location during emergencies</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Data Collection</h5>
+                            <p class="mb-0 text-muted">Allow us to collect anonymous usage data to improve our services</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-save">Update Security Settings</button>
+                </div>
+            </div>
+            
+            <!-- App Preferences -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-sliders-h"></i> App Preferences</h2>
+                
+                <div class="settings-card">
+                    <div class="mb-3">
+                        <label for="language" class="form-label">Language</label>
+                        <select class="form-control" id="language">
+                            <option selected>English</option>
+                            <option>Spanish</option>
+                            <option>French</option>
+                            <option>German</option>
+                            <option>Chinese</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="distanceUnit" class="form-label">Distance Unit</label>
+                        <select class="form-control" id="distanceUnit">
+                            <option selected>Miles</option>
+                            <option>Kilometers</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="theme" class="form-label">Theme</label>
+                        <select class="form-control" id="theme">
+                            <option selected>Dark (Default)</option>
+                            <option>Light</option>
+                            <option>Auto (System)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Auto-Navigation</h5>
+                            <p class="mb-0 text-muted">Automatically open directions in your preferred maps app</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Haptic Feedback</h5>
+                            <p class="mb-0 text-muted">Enable vibration feedback for interactions</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-save">Save Preferences</button>
+                </div>
+            </div>
+            
+            <!-- Emergency Settings -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-exclamation-triangle"></i> Emergency Settings</h2>
+                
+                <div class="settings-card">
+                    <div class="mb-3">
+                        <label for="emergencyMessage" class="form-label">Emergency Message</label>
+                        <textarea class="form-control" id="emergencyMessage" rows="3">I need emergency medical assistance. Please help! My location will be shared with this message.</textarea>
+                        <div class="form-text">This message will be sent to your emergency contacts when you trigger an SOS alert</div>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Auto-Send Location</h5>
+                            <p class="mb-0 text-muted">Automatically include your location in emergency alerts</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Emergency Sound</h5>
+                            <p class="mb-0 text-muted">Play a loud sound when emergency mode is activated</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="mb-3 d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">Flash Alert</h5>
+                            <p class="mb-0 text-muted">Flash your phone's LED during emergencies</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-save">Save Emergency Settings</button>
+                </div>
+            </div>
+            
+            <!-- Account Management -->
+            <div class="settings-section">
+                <h2 class="section-title"><i class="fas fa-user-times"></i> Account Management</h2>
+                
+                <div class="settings-card">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Warning:</strong> These actions are irreversible. Please proceed with caution.
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-outline-danger">
+                            <i class="fas fa-file-download me-2"></i> Download Your Data
+                        </button>
+                        
+                        <button class="btn btn-outline-warning">
+                            <i class="fas fa-ban me-2"></i> Deactivate Account
+                        </button>
+                        
+                        <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                            <i class="fas fa-trash-alt me-2"></i> Delete Account Permanently
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Account Modal -->
+    <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAccountModalLabel">Delete Account</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <strong>This action cannot be undone.</strong> All your data will be permanently deleted.
+                    </div>
+                    <p>Are you sure you want to delete your account? This will remove all your personal information, medical data, and emergency contacts from our system.</p>
+                    <div class="mb-3">
+                        <label for="deleteConfirm" class="form-label">Type "DELETE" to confirm</label>
+                        <input type="text" class="form-control" id="deleteConfirm">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton" disabled>Delete My Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Settings page functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize toggle switches
+            const toggleSwitches = document.querySelectorAll('.toggle-switch input');
+            toggleSwitches.forEach(toggle => {
+                toggle.addEventListener('change', function() {
+                    console.log('Toggle switched:', this.checked);
+                    // Here you would save the preference to your backend
+                });
+            });
+            
+            // Form submission handlers
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    // Simulate saving settings
+                    const saveButton = this.querySelector('.btn-save');
+                    const originalText = saveButton.innerHTML;
+                    
+                    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                    saveButton.disabled = true;
+                    
+                    setTimeout(() => {
+                        saveButton.innerHTML = '<i class="fas fa-check"></i> Saved!';
+                        setTimeout(() => {
+                            saveButton.innerHTML = originalText;
+                            saveButton.disabled = false;
+                        }, 1500);
+                    }, 1000);
+                });
+            });
+            
+            // Delete account confirmation
+            const deleteConfirm = document.getElementById('deleteConfirm');
+            const deleteButton = document.getElementById('confirmDeleteButton');
+            
+            if (deleteConfirm && deleteButton) {
+                deleteConfirm.addEventListener('input', function() {
+                    deleteButton.disabled = this.value !== 'DELETE';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

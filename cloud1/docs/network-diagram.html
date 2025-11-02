@@ -1,0 +1,477 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMResource - Network Diagram</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .controls { background: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .network-container { background: white; border-radius: 8px; padding: 20px; }
+        .node { cursor: pointer; }
+        .node-frontend { fill: #3498db; }
+        .node-backend { fill: #e74c3c; }
+        .node-database { fill: #2ecc71; }
+        .node-config { fill: #f39c12; }
+        .node-external { fill: #9b59b6; }
+        .link { stroke: #999; stroke-opacity: 0.6; }
+        .link-http { stroke: #3498db; stroke-width: 2px; }
+        .link-mongoose { stroke: #2ecc71; stroke-width: 2px; }
+        .link-import { stroke: #f39c12; stroke-width: 1.5px; }
+        .link-connection { stroke: #e74c3c; stroke-width: 2px; }
+        .link-api { stroke: #9b59b6; stroke-width: 1.5px; }
+        .link-smtp { stroke: #34495e; stroke-width: 1.5px; }
+        .link-javascript { stroke: #f1c40f; stroke-width: 1.5px; }
+        .node-label { font-size: 12px; text-anchor: middle; pointer-events: none; }
+        .legend { position: absolute; top: 20px; right: 20px; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .legend-item { display: flex; align-items: center; margin: 5px 0; }
+        .legend-color { width: 20px; height: 20px; margin-right: 10px; border-radius: 3px; }
+        .tooltip { position: absolute; background: rgba(0,0,0,0.8); color: white; padding: 8px; border-radius: 4px; font-size: 12px; pointer-events: none; opacity: 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏥 EMResource - Component Network Diagram</h1>
+        
+        <div class="controls">
+            <button onclick="resetSimulation()">Reset Layout</button>
+            <button onclick="toggleLabels()">Toggle Labels</button>
+            <label>
+                <input type="range" id="linkDistance" min="50" max="200" value="100" onchange="updateLinkDistance(this.value)">
+                Link Distance: <span id="linkDistanceValue">100</span>
+            </label>
+        </div>
+        
+        <div class="network-container">
+            <svg id="network" width="1160" height="800"></svg>
+        </div>
+        
+        <div class="legend">
+            <h3>Component Types</h3>
+            <div class="legend-item"><div class="legend-color node-frontend"></div>Frontend (Views)</div>
+            <div class="legend-item"><div class="legend-color node-backend"></div>Backend (Routes)</div>
+            <div class="legend-item"><div class="legend-color node-database"></div>Database (Models)</div>
+            <div class="legend-item"><div class="legend-color node-config"></div>Configuration</div>
+            <div class="legend-item"><div class="legend-color node-external"></div>External Services</div>
+        </div>
+    </div>
+    
+    <div class="tooltip" id="tooltip"></div>
+
+    <script>
+        const nodes = [
+  {
+    "id": "landing_page",
+    "name": "Landing Page",
+    "type": "frontend",
+    "file": "views/index.ejs"
+  },
+  {
+    "id": "dashboard",
+    "name": "User Dashboard",
+    "type": "frontend",
+    "file": "views/dashboard.ejs"
+  },
+  {
+    "id": "resource_finder",
+    "name": "Resource Finder",
+    "type": "frontend",
+    "file": "views/resource.ejs"
+  },
+  {
+    "id": "donor_page",
+    "name": "Donor Registration",
+    "type": "frontend",
+    "file": "views/donor.ejs"
+  },
+  {
+    "id": "admin_panel",
+    "name": "Admin Panel",
+    "type": "frontend",
+    "file": "views/admin.ejs"
+  },
+  {
+    "id": "hospital_dashboard",
+    "name": "Hospital Dashboard",
+    "type": "frontend",
+    "file": "views/hospital-dashboard.ejs"
+  },
+  {
+    "id": "auth_routes",
+    "name": "Authentication Routes",
+    "type": "backend",
+    "file": "routes/auth.js"
+  },
+  {
+    "id": "facility_routes",
+    "name": "Facility Routes",
+    "type": "backend",
+    "file": "routes/facilities.js"
+  },
+  {
+    "id": "donor_routes",
+    "name": "Donor Routes",
+    "type": "backend",
+    "file": "routes/donors.js"
+  },
+  {
+    "id": "emergency_routes",
+    "name": "Emergency Routes",
+    "type": "backend",
+    "file": "routes/emergency.js"
+  },
+  {
+    "id": "admin_routes",
+    "name": "Admin Routes",
+    "type": "backend",
+    "file": "routes/admin.js"
+  },
+  {
+    "id": "hospital_routes",
+    "name": "Hospital Routes",
+    "type": "backend",
+    "file": "routes/hospital.js"
+  },
+  {
+    "id": "chat_routes",
+    "name": "Chat Routes",
+    "type": "backend",
+    "file": "routes/chat.js"
+  },
+  {
+    "id": "user_model",
+    "name": "User Model",
+    "type": "database",
+    "file": "models/User.js"
+  },
+  {
+    "id": "facility_model",
+    "name": "Medical Facility Model",
+    "type": "database",
+    "file": "models/MedicalFacility.js"
+  },
+  {
+    "id": "donor_model",
+    "name": "Blood Donor Model",
+    "type": "database",
+    "file": "models/BloodDonor.js"
+  },
+  {
+    "id": "emergency_model",
+    "name": "Emergency Request Model",
+    "type": "database",
+    "file": "models/EmergencyRequest.js"
+  },
+  {
+    "id": "chat_model",
+    "name": "Chat Model",
+    "type": "database",
+    "file": "models/Chat.js"
+  },
+  {
+    "id": "otp_model",
+    "name": "OTP Model",
+    "type": "database",
+    "file": "models/OTP.js"
+  },
+  {
+    "id": "passport_config",
+    "name": "Passport Config",
+    "type": "config",
+    "file": "config/passport.js"
+  },
+  {
+    "id": "email_service",
+    "name": "Email Service",
+    "type": "config",
+    "file": "config/emailService.js"
+  },
+  {
+    "id": "gcp_apis",
+    "name": "Google Cloud APIs",
+    "type": "config",
+    "file": "config/gcp-apis.js"
+  },
+  {
+    "id": "mongodb",
+    "name": "MongoDB Atlas",
+    "type": "external",
+    "file": "external"
+  },
+  {
+    "id": "google_maps",
+    "name": "Google Maps API",
+    "type": "external",
+    "file": "external"
+  },
+  {
+    "id": "google_oauth",
+    "name": "Google OAuth",
+    "type": "external",
+    "file": "external"
+  },
+  {
+    "id": "email_smtp",
+    "name": "Email SMTP",
+    "type": "external",
+    "file": "external"
+  }
+];
+        const links = [
+  {
+    "source": "landing_page",
+    "target": "auth_routes",
+    "type": "http"
+  },
+  {
+    "source": "dashboard",
+    "target": "facility_routes",
+    "type": "http"
+  },
+  {
+    "source": "dashboard",
+    "target": "emergency_routes",
+    "type": "http"
+  },
+  {
+    "source": "resource_finder",
+    "target": "facility_routes",
+    "type": "http"
+  },
+  {
+    "source": "resource_finder",
+    "target": "donor_routes",
+    "type": "http"
+  },
+  {
+    "source": "donor_page",
+    "target": "donor_routes",
+    "type": "http"
+  },
+  {
+    "source": "admin_panel",
+    "target": "admin_routes",
+    "type": "http"
+  },
+  {
+    "source": "hospital_dashboard",
+    "target": "hospital_routes",
+    "type": "http"
+  },
+  {
+    "source": "auth_routes",
+    "target": "user_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "auth_routes",
+    "target": "otp_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "facility_routes",
+    "target": "facility_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "donor_routes",
+    "target": "donor_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "emergency_routes",
+    "target": "emergency_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "emergency_routes",
+    "target": "donor_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "chat_routes",
+    "target": "chat_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "admin_routes",
+    "target": "user_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "admin_routes",
+    "target": "facility_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "hospital_routes",
+    "target": "facility_model",
+    "type": "mongoose"
+  },
+  {
+    "source": "auth_routes",
+    "target": "passport_config",
+    "type": "import"
+  },
+  {
+    "source": "auth_routes",
+    "target": "email_service",
+    "type": "import"
+  },
+  {
+    "source": "resource_finder",
+    "target": "gcp_apis",
+    "type": "import"
+  },
+  {
+    "source": "user_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "facility_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "donor_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "emergency_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "chat_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "otp_model",
+    "target": "mongodb",
+    "type": "connection"
+  },
+  {
+    "source": "passport_config",
+    "target": "google_oauth",
+    "type": "api"
+  },
+  {
+    "source": "email_service",
+    "target": "email_smtp",
+    "type": "smtp"
+  },
+  {
+    "source": "gcp_apis",
+    "target": "google_maps",
+    "type": "api"
+  },
+  {
+    "source": "resource_finder",
+    "target": "google_maps",
+    "type": "javascript"
+  }
+];
+        
+        const svg = d3.select("#network");
+        const width = +svg.attr("width");
+        const height = +svg.attr("height");
+        
+        let showLabels = true;
+        let linkDistance = 100;
+        
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id).distance(linkDistance))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .force("center", d3.forceCenter(width / 2, height / 2))
+            .force("collision", d3.forceCollide().radius(30));
+        
+        const link = svg.append("g")
+            .selectAll("line")
+            .data(links)
+            .enter().append("line")
+            .attr("class", d => `link link-${d.type}`);
+        
+        const node = svg.append("g")
+            .selectAll("g")
+            .data(nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .call(d3.drag()
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+        
+        node.append("circle")
+            .attr("r", 20)
+            .attr("class", d => `node-${d.type}`)
+            .on("mouseover", showTooltip)
+            .on("mouseout", hideTooltip);
+        
+        const labels = node.append("text")
+            .attr("class", "node-label")
+            .attr("dy", 35)
+            .text(d => d.name.length > 15 ? d.name.substring(0, 15) + "..." : d.name);
+        
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+            
+            node.attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+        
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+        
+        function showTooltip(event, d) {
+            const tooltip = d3.select("#tooltip");
+            tooltip.style("opacity", 1)
+                .html(`<strong>${d.name}</strong><br/>Type: ${d.type}<br/>File: ${d.file}`)
+                .style("left", (event.pageX + 10) + "px")
+                .style("top", (event.pageY - 10) + "px");
+        }
+        
+        function hideTooltip() {
+            d3.select("#tooltip").style("opacity", 0);
+        }
+        
+        function resetSimulation() {
+            simulation.alpha(1).restart();
+        }
+        
+        function toggleLabels() {
+            showLabels = !showLabels;
+            labels.style("opacity", showLabels ? 1 : 0);
+        }
+        
+        function updateLinkDistance(value) {
+            linkDistance = +value;
+            document.getElementById("linkDistanceValue").textContent = value;
+            simulation.force("link").distance(linkDistance);
+            simulation.alpha(1).restart();
+        }
+    </script>
+</body>
+</html>

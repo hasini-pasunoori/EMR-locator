@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMResource - Data Flow Visualization</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .flow-section { margin: 30px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .flow-title { color: #2c3e50; font-size: 24px; margin-bottom: 15px; }
+        .mermaid { text-align: center; margin: 20px 0; }
+        .file-reference { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; }
+        .role-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
+        .role-card { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #007bff; }
+    </style>
+</head>
+<body>
+    <h1>🏥 EMResource - Data Flow Visualization</h1>
+    
+    <div class="flow-section">
+        <h2 class="flow-title">🔐 Authentication Flow</h2>
+        <div class="mermaid">
+            graph TD
+    user_input["User Input<br/>Email, Password, Role selection"]
+    validation["Input Validation<br/>express-validator checks"]
+    user_lookup["User Lookup<br/>Find user in MongoDB"]
+    password_check["Password Verification<br/>bcrypt comparison"]
+    role_check["Role Verification<br/>Check user role matches request"]
+    otp_generation["OTP Generation<br/>Generate 6-digit OTP"]
+    email_send["Email OTP<br/>Send OTP via Nodemailer"]
+    otp_verification["OTP Verification<br/>Verify submitted OTP"]
+    session_creation["Session Creation<br/>Create user session"]
+    role_redirect["Role-based Redirect<br/>Redirect to appropriate dashboard"]
+    user_input --> validation
+    validation --> user_lookup
+    user_lookup --> password_check
+    password_check --> role_check
+    role_check --> otp_generation
+    otp_generation --> email_send
+    email_send --> otp_verification
+    otp_verification --> session_creation
+    session_creation --> role_redirect
+
+        </div>
+        <div class="file-reference">
+            <strong>Key Files:</strong> routes/auth.js, config/passport.js, models/User.js, config/emailService.js
+        </div>
+    </div>
+
+    <div class="flow-section">
+        <h2 class="flow-title">🔍 Resource Discovery Flow</h2>
+        <div class="mermaid">
+            graph TD
+    location_input["Location Input<br/>GPS coordinates or address"]
+    geocoding["Geocoding<br/>Convert address to coordinates"]
+    geospatial_query["Geospatial Query<br/>MongoDB $near query with radius"]
+    distance_calculation["Distance Calculation<br/>Calculate distances using Haversine formula"]
+    results_sorting["Results Sorting<br/>Sort by distance and availability"]
+    map_rendering["Map Rendering<br/>Display results on Google Maps"]
+    location_input --> geocoding
+    geocoding --> geospatial_query
+    geospatial_query --> distance_calculation
+    distance_calculation --> results_sorting
+    results_sorting --> map_rendering
+
+        </div>
+        <div class="file-reference">
+            <strong>Key Files:</strong> routes/facilities.js, views/resource.ejs, models/MedicalFacility.js
+        </div>
+    </div>
+
+    <div class="flow-section">
+        <h2 class="flow-title">🚨 Emergency Request Flow</h2>
+        <div class="mermaid">
+            graph TD
+    emergency_input["Emergency Input<br/>Blood type, urgency, location"]
+    request_validation["Request Validation<br/>Validate emergency request data"]
+    donor_search["Donor Search<br/>Find compatible donors nearby"]
+    notification_send["Send Notifications<br/>Email/SMS to potential donors"]
+    response_tracking["Response Tracking<br/>Track donor responses"]
+    chat_initiation["Chat Initiation<br/>Enable communication between parties"]
+    emergency_input --> request_validation
+    request_validation --> donor_search
+    donor_search --> notification_send
+    notification_send --> response_tracking
+    response_tracking --> chat_initiation
+
+        </div>
+        <div class="file-reference">
+            <strong>Key Files:</strong> routes/emergency.js, routes/donors.js, routes/chat.js, config/emailService.js
+        </div>
+    </div>
+
+    <div class="flow-section">
+        <h2 class="flow-title">👥 Role-Based Access Control</h2>
+        <div class="role-grid">
+            
+                <div class="role-card">
+                    <h3>Regular User</h3>
+                    <p><strong>Dashboard:</strong> /dashboard</p>
+                    <p><strong>Permissions:</strong></p>
+                    <ul>
+                        <li>view resources</li><li>create requests</li><li>chat</li>
+                    </ul>
+                    <p><strong>Routes:</strong> /resource, /requests, /chat</p>
+                </div>
+            
+                <div class="role-card">
+                    <h3>Blood Donor</h3>
+                    <p><strong>Dashboard:</strong> /donor/dashboard</p>
+                    <p><strong>Permissions:</strong></p>
+                    <ul>
+                        <li>view resources</li><li>respond requests</li><li>manage profile</li>
+                    </ul>
+                    <p><strong>Routes:</strong> /donor, /responses, /chat</p>
+                </div>
+            
+                <div class="role-card">
+                    <h3>Hospital Staff</h3>
+                    <p><strong>Dashboard:</strong> /hospital/dashboard</p>
+                    <p><strong>Permissions:</strong></p>
+                    <ul>
+                        <li>manage facility</li><li>update beds</li><li>view analytics</li>
+                    </ul>
+                    <p><strong>Routes:</strong> /hospital, /beds, /analytics</p>
+                </div>
+            
+                <div class="role-card">
+                    <h3>System Administrator</h3>
+                    <p><strong>Dashboard:</strong> /admin/dashboard</p>
+                    <p><strong>Permissions:</strong></p>
+                    <ul>
+                        <li>manage users</li><li>verify facilities</li><li>system analytics</li>
+                    </ul>
+                    <p><strong>Routes:</strong> /admin, /analytics, /users</p>
+                </div>
+            
+        </div>
+    </div>
+
+    <div class="flow-section">
+        <h2 class="flow-title">🗄️ Database Collections & Operations</h2>
+        
+            <div class="role-card">
+                <h3>USERS</h3>
+                <p><strong>Model:</strong> models/User.js</p>
+                <p><strong>Indexes:</strong> email, location (2dsphere)</p>
+                <p><strong>Operations:</strong> create, authenticate, update_profile</p>
+            </div>
+        
+            <div class="role-card">
+                <h3>MEDICALFACILITIES</h3>
+                <p><strong>Model:</strong> models/MedicalFacility.js</p>
+                <p><strong>Indexes:</strong> location (2dsphere), type, address.city</p>
+                <p><strong>Operations:</strong> geospatial_search, capacity_update, verification</p>
+            </div>
+        
+            <div class="role-card">
+                <h3>BLOODDONORS</h3>
+                <p><strong>Model:</strong> models/BloodDonor.js</p>
+                <p><strong>Indexes:</strong> location (2dsphere), bloodType, availability</p>
+                <p><strong>Operations:</strong> donor_search, availability_update, response_tracking</p>
+            </div>
+        
+            <div class="role-card">
+                <h3>EMERGENCYREQUESTS</h3>
+                <p><strong>Model:</strong> models/EmergencyRequest.js</p>
+                <p><strong>Indexes:</strong> location (2dsphere), bloodType, status</p>
+                <p><strong>Operations:</strong> create_request, match_donors, status_update</p>
+            </div>
+        
+            <div class="role-card">
+                <h3>CHATS</h3>
+                <p><strong>Model:</strong> models/Chat.js</p>
+                <p><strong>Indexes:</strong> participants, createdAt</p>
+                <p><strong>Operations:</strong> send_message, get_conversations, mark_read</p>
+            </div>
+        
+    </div>
+
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
