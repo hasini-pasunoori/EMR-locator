@@ -86,9 +86,11 @@ router.post('/signup/verify-otp', [
     const pendingUser = req.session.pendingUser;
 
     if (!pendingUser) {
+      console.log('Session data:', req.session);
       return res.status(400).json({
         success: false,
-        message: 'No pending registration found. Please start signup again.'
+        message: 'No pending registration found. Please start signup again.',
+        debug: 'Session expired or not found'
       });
     }
 
@@ -252,9 +254,11 @@ router.post('/signin/verify-otp', [
     const pendingSignin = req.session.pendingSignin;
 
     if (!pendingSignin) {
+      console.log('Session data:', req.session);
       return res.status(400).json({
         success: false,
-        message: 'No pending signin found. Please start signin again.'
+        message: 'No pending signin found. Please start signin again.',
+        debug: 'Session expired or not found'
       });
     }
 
