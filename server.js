@@ -24,17 +24,26 @@ const userRoutes = require('./routes/user');
 const adminRoutes = require('./routes/admin');
 
 // MongoDB Atlas connection
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('Connected to MongoDB Atlas successfully');
-})
-.catch((error) => {
-  console.error('MongoDB Atlas connection error:', error);
-  process.exit(1);
-});
+if (!process.env.MONGODB_URI) {
+  console.error('MONGODB_URI environment variable is not set');
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
+} else {
+  mongoose.connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('Connected to MongoDB Atlas successfully');
+  })
+  .catch((error) => {
+    console.error('MongoDB Atlas connection error:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
+  });
+}
 
 // MongoDB connection event listeners
 mongoose.connection.on('connected', () => {
@@ -248,6 +257,12 @@ app.get('/api/user', (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
